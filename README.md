@@ -1,8 +1,8 @@
 ### Labelprinterkit
 
-Labelprinterkit is a Python3 library for creating and printing labels. It was
-developed for the Networking department of the KIT (Karlsruhe Institute of
-Technology).
+Labelprinterkit is a Python3 library for creating and printing labels with
+Brother P-Touch devices. It was developed for the Networking department of
+KIT (Karlsruhe Institute of Technology).
 
 Labelprinterkit's simple layout engine can be used to declaratively create
 simple labels:
