@@ -8,8 +8,9 @@ Labelprinterkit's simple layout engine can be used to declaratively create
 simple labels:
 
 ```python
-from Labelprinterkit import backends, items, label
-from Labelprinterkit.printers.brother_pt700 import P700
+from labelprinterkit import backends, items, label
+from labelprinterkit.printers.brother_pt700 import P700
+from labelprinterkit.backend.usb import PyUSBBackend
 
 # Define the layout of our label
 # We define a single row with two text items.
