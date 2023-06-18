@@ -1,14 +1,10 @@
 """
 Brother P-Touch P700 Driver
 """
-import io
-import random
 import struct
-import time
 from collections import namedtuple
 from enum import Enum, IntEnum
-from itertools import chain, islice
-from pprint import pprint
+from itertools import islice
 from typing import Iterable, Sequence
 from math import ceil
 import logging
@@ -176,17 +172,18 @@ class P700(BasePrinter):
 
     def connect(self) -> None:
         """Connect to Printer"""
-        self.io.write(b'\x00' * 100)
-        self.io.write(b'\x1b@')
-
         logger.info("connected")
+
+    def reset(self) -> None:
+        self.backend.write(b'\x00' * 100) # Invalidate command
+        self.backend.write(b'\x1b@') # Initialize command 1b 40
 
     def get_status(self) -> Status:
         """get status of the printer as ``Status`` object"""
-        with self.io.lock:
-            self.io.write(b'\x1BiS')
-            data = self.io.read(32)
-
+        with self.backend.lock:
+            self.reset()
+            self.backend.write(b'\x1BiS')
+            data = self.backend.read(32)
             if not data:
                 raise IOError("No Response from printer")
 
@@ -196,7 +193,7 @@ class P700(BasePrinter):
             return Status(data)
 
     def _debug_status(self):
-        data = self.io.read(32)
+        data = self.backend.read(32)
 
         if data:
             logger.debug(Status(data))
@@ -221,54 +218,68 @@ class P700(BasePrinter):
         logger.info("tape info: %s", status.tape_info)
 
         # img.show()
-
-        with self.io.lock:
+        with self.backend.lock:
             self._raw_print(
-                status, batch_iter_bytes(img.tobytes(), ceil(img.size[0] / 8)))
-        return self.get_status()
+                status, list(batch_iter_bytes(img.tobytes(), ceil(img.size[0] / 8))))
+        #return self.get_status()
 
     def _dummy_print(self, status: Status, document: Iterable[bytes]) -> None:
         for line in document:
             # print(b'G' + encode_line(line, status.tape_info))
             encode_line(line, status.tape_info)
 
-    def _raw_print(self, status: Status, document: Iterable[bytes]) -> None:
+    def _raw_print(self, status: Status, document: Iterable[bytes], count: int = 1) -> None:
         logger.info("starting print")
 
-        # raster mode
-        self.io.write(b'\x1Bia\x01')
-        self._debug_status()
+        self.reset()
 
-        # Compression mode
-        self.io.write(b'M\x02')
-        self._debug_status()
+        for i in range(0, count):
+            # raster mode
+            self.backend.write(b'\x1Bia\x01') # switch dynamic command mode 1B 69 61 01
+            self._debug_status()
 
-        # Various mode
-        # self.io.write(b'\x1biM\x20')  # 20: 6th bit
-        self._debug_status()
+            # Print information command
+            self.backend.write(b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00') # 1B 69 7a ... 84 00 18 00 AA 02 00 00 00 00
+            #self._debug_status()
 
-        # Advanced mode
-        self.io.write(b'\x1biK\x08')
-        self._debug_status()
+            if i == 0:
+                # Ugly workaround
+                # Print information command a second time forces cutting after first page.
+                # Noe one knows why this is needed
+                self.backend.write(b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00') # 1B 69 7a ... 84 00 18 00 AA 02 00 00 00 00
 
-        # margin
-        self.io.write(b'\x1bid\x0E\x00')
-        self._debug_status()
+            # Various mode
+            self.backend.write(b'\x1biM\x40')  # autocut 1B 69 4D 40
+            self._debug_status()
 
-        # print information
-        # self.io.write(b'\x1Biz [...] \x00')
+            # cut
+            #self.backend.write(b'\x1biA' + count.to_bytes(1))
+            self.backend.write(b'\x1biA\x01') #1B 69 41 01
 
-        self.io.write(b'Z')
+            # Advanced mode
+            self.backend.write(b'\x1biK\x08') # 1B 69 4B 41 08
+            #self.backend.write(b'\x1biK\x00') # 1B 69 4B 41 00
+            self._debug_status()
 
-        # raster line
+            # margin
+            self.backend.write(b'\x1bid\x0E\x00') # 1B 69 64 OE OO
+            self._debug_status()
 
-        for line in document:
-            self.io.write(b'G' + encode_line(line, status.tape_info))
+            # Compression mode
+            self.backend.write(b'M\x02') # 4d 02
+            self._debug_status()
 
-        self.io.write(b'Z')
+            # raster line
+            for line in document:
+                self.backend.write(b'G' + encode_line(line, status.tape_info))
+
+            self.backend.write(b'Z')
+
+            if i < count - 1:
+                self.backend.write(b'\x0C')
 
         # end page
         self._debug_status()
-        self.io.write(b'\x1A')
+        self.backend.write(b'\x1A')
         self._debug_status()
         logger.info("end of page")
