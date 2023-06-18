@@ -1,8 +1,8 @@
-import io
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
+from typing import Tuple
 
 from ..label import Label
+from ..backends import BaseBackend
 
 
 class BaseErrorStatus(ABC):
@@ -44,8 +44,8 @@ class BasePrinter(ABC):
 
     DPI = None  # type: Tuple[float, float]
 
-    def __init__(self, io_obj: io.BufferedIOBase) -> None:
-        self.io = io_obj
+    def __init__(self, backend: BaseBackend) -> None:
+        self.backend = backend
 
     def estimate_label_size(self, label: Label) -> Tuple[float, float]:
         """estimate the Labels size in mm"""
