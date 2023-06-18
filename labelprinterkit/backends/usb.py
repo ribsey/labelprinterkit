@@ -1,5 +1,7 @@
 from typing import Self
 
+from time import sleep
+
 import usb.core
 import usb.util
 
@@ -26,4 +28,8 @@ class PyUSBBackend(BaseBackend):
         self.dev.write(0x2, data)
 
     def read(self, count: int) -> bytes:
-        return self.dev.read(0x81, count)
+        for i in range(0, 3):
+            data = self.dev.read(0x81, count)
+            if data:
+                return data
+            sleep(0.1)
