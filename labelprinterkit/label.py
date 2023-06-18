@@ -1,15 +1,45 @@
 """
-Labels are the Base class you derive your Labels from. A few simple Labels are
-provided for you.
+Labels are the Base class you derive your Labels from.
 """
 from typing import Tuple
+from logging import getLogger
 
-from PIL import Image
+from PIL import Image, ImageChops, ImageDraw, ImageFont
+
+from .page import Page
+
+logger = getLogger(__name__)
 
 
 def _coord_add(tup1, tup2):
     """add two tuples of size two"""
-    return (tup1[0] + tup2[0], tup1[1] + tup2[1])
+    return tup1[0] + tup2[0], tup1[1] + tup2[1]
+
+
+class Text:
+    """A simple text item"""
+    def __init__(self, font: ImageFont = None, **kwargs) -> None:
+        if font:
+            self.font = font
+        else:
+            # fallback to default font
+            self.font = ImageFont.load_default()
+
+        self.pad_top = kwargs.get("pad_top", 0)
+        self.pad_right = kwargs.get("pad_right", 0)
+        self.pad_bottom = kwargs.get("pad_bottom", 0)
+        self.pad_left = kwargs.get("pad_left", 0)
+
+    def render(self, text):
+        text_x, text_y = self.font.getsize(text)
+        padded_size = (
+            text_x + self.pad_left + self.pad_right,
+            text_y + self.pad_top + self.pad_bottom,
+        )
+        image = Image.new("1", padded_size, "white")
+        draw = ImageDraw.Draw(image)
+        draw.text((self.pad_left, self.pad_top), text, "black", self.font)
+        return image
 
 
 class Label:
@@ -17,10 +47,11 @@ class Label:
 
     >>> class MyLabel(Label):
     ...     items = [
-    ...         Text(), Text()
+    ...         [Text(), Text()],
+    ...         [Text()]
     ...     ]
-    >>> l = MyLabel("text1", "text2")
-    >>> printer.print(l)
+    >>> label = MyLabel("text1", "text2")
+    >>> printer.print(label)
 
     """
     items = []  # type: list
@@ -51,11 +82,10 @@ class Label:
 
         return width, height
 
-    def render(self, width=None, height=None) -> Image:
+    def render(self, height=None) -> Image:
         """render the Label.
 
         Args:
-            width: Width request
             height: Height request
         """
         size = self.size
@@ -73,12 +103,20 @@ class Label:
             pos[1] += max(i.size[1] for i in line)
 
         xdim, ydim = img.size
-        print("presize", xdim, ydim, height)
+        logger.debug(f"presize {xdim}, {ydim}, {height}")
         xdim = round((height / ydim) * xdim)
 
-        print("calcsize", xdim, ydim)
+        logger.debug(f"calcsize {xdim}, {ydim}")
         img = img.resize((xdim, height))
 
         return img
 
-# print("".join(f"{x:08b}".replace("0", " ") for x in bytes(i)))
+    def page(self, height: int):
+        img = self.render(height=height)
+        if not img.mode == "1":
+            raise ValueError("render output has invalid mode '1'")
+        img = img.transpose(Image.ROTATE_270).transpose(
+            Image.FLIP_TOP_BOTTOM)
+        img = ImageChops.invert(img)
+        page = Page(img.tobytes(), img.size[0], img.size[1])
+        return page
