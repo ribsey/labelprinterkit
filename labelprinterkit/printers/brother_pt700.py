@@ -1,11 +1,12 @@
 """
 Brother P-Touch P700 Driver
 """
+from abc import ABC, abstractmethod
 import struct
 from collections import namedtuple
 from enum import Enum, IntEnum
 from itertools import islice
-from typing import Iterable, Sequence
+from typing import Iterable, Sequence, Tuple
 from math import ceil
 import logging
 
@@ -13,9 +14,67 @@ import packbits
 from PIL import Image, ImageChops
 
 from ..label import Label
-from . import BasePrinter, BaseStatus, BaseErrorStatus
+from ..backends import BaseBackend
 
 logger = logging.getLogger(__name__)
+
+
+class BaseErrorStatus(ABC):
+    """Represents the errors the printer has"""
+    @abstractmethod
+    def any(self):
+        """return if any errors have occurred"""
+        return any(self.data.values())
+
+    def __getattr__(self, attr):
+        return self.data[attr]
+
+    def __repr__(self):
+        return "<Errors {}>".format(self.data)
+
+
+class BaseStatus(ABC):
+    """Represents the status of the printer"""
+    errors = None  # type: BaseErrorStatus
+
+    def __repr__(self):
+        return "<Status {} {} {}>".format(self.data, self.errors,
+                                          self.tape_info)
+
+    @abstractmethod
+    def __getattr__(self, attr):
+        pass
+
+    @abstractmethod
+    def ready(self) -> bool:
+        """return if the printer is ready for printing"""
+        pass
+
+
+class BasePrinter(ABC):
+    """Base class for printers. All printers define this API.  Any other
+    methods are prefixed with a _ to indicate they are not part of the
+    printer API"""
+
+    DPI = None  # type: Tuple[float, float]
+
+    def __init__(self, backend: BaseBackend) -> None:
+        self.backend = backend
+
+    def estimate_label_size(self, label: Label) -> Tuple[float, float]:
+        """estimate the Labels size in mm"""
+
+        xdpi, ydpi = self.DPI
+        xpixels, ypixels = label.size
+        return (xpixels / xdpi) * 2.54, (ypixels / ydpi) * 2.54
+
+    def print_label(self, label: Label) -> BaseStatus:
+        """Print the label"""
+
+    @abstractmethod
+    def connect(self) -> None:
+        """Connect to the Printer"""
+        pass
 
 
 def batch_iter_bytes(b, size):
@@ -180,17 +239,16 @@ class P700(BasePrinter):
 
     def get_status(self) -> Status:
         """get status of the printer as ``Status`` object"""
-        with self.backend.lock:
-            self.reset()
-            self.backend.write(b'\x1BiS')
-            data = self.backend.read(32)
-            if not data:
-                raise IOError("No Response from printer")
+        self.reset()
+        self.backend.write(b'\x1BiS')
+        data = self.backend.read(32)
+        if not data:
+            raise IOError("No Response from printer")
 
-            if len(data) < 32:
-                raise IOError("Invalid Response from printer")
+        if len(data) < 32:
+            raise IOError("Invalid Response from printer")
 
-            return Status(data)
+        return Status(data)
 
     def _debug_status(self):
         data = self.backend.read(32)
@@ -218,9 +276,8 @@ class P700(BasePrinter):
         logger.info("tape info: %s", status.tape_info)
 
         # img.show()
-        with self.backend.lock:
-            self._raw_print(
-                status, list(batch_iter_bytes(img.tobytes(), ceil(img.size[0] / 8))))
+        self._raw_print(
+             status, list(batch_iter_bytes(img.tobytes(), ceil(img.size[0] / 8))))
         #return self.get_status()
 
     def _dummy_print(self, status: Status, document: Iterable[bytes]) -> None:
@@ -239,7 +296,8 @@ class P700(BasePrinter):
             self._debug_status()
 
             # Print information command
-            self.backend.write(b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00') # 1B 69 7a ... 84 00 18 00 AA 02 00 00 00 00
+            self.backend.write(b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00')
+            #self.backend.write(b'\x1Biz\x84\x00\x0c\x00\x96\x00\00\x00\x00')
             #self._debug_status()
 
             if i == 0:

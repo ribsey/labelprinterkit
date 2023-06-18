@@ -1,19 +1,17 @@
 from abc import ABC, abstractmethod
-import threading
 
 
 class BaseBackend(ABC):
-    def __init__(self, dev):
-        self.dev = dev
+    ...
 
-        # TODO: This does not belong here. Locking is the job of the
-        # application
-        self.lock = threading.Lock()
 
+class UniDirectionalBackend(BaseBackend):
     @abstractmethod
     def write(self, data: bytes):
         ...
 
+
+class BiDirectionalBackend(UniDirectionalBackend):
     @abstractmethod
     def read(self, count: int) -> bytes:
         ...

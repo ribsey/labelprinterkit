@@ -1,11 +1,10 @@
 import serial
 
-from . import BaseBackend
+from . import BiDirectionalBackend
 
 
-class BTSerialBackend(BaseBackend):
-    @classmethod
-    def auto(cls, dev_path: str):
+class BTSerialBackend(BiDirectionalBackend):
+    def __init__(self, dev_path: str):
         dev = serial.Serial(
             dev_path,
             baudrate=9600,
@@ -17,11 +16,11 @@ class BTSerialBackend(BaseBackend):
         )
         if dev is None:
             raise OSError('Device not found')
-        return cls(dev)
+        self._dev = dev
 
     def write(self, data: bytes):
-        self.dev.write(data)
+        self._dev.write(data)
 
     def read(self, count: int) -> bytes:
-        data = self.dev.read(count)
+        data = self._dev.read(count)
         return data
