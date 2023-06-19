@@ -4,7 +4,7 @@ import abc
 from typing import Optional
 
 import usb.core
-import usb.util
+import serial
 
 class PrintingBackend(abc.ABC):
     """printing backends are responsible for transmitting and receiving the
@@ -46,3 +46,30 @@ class PyUSBBackend(PrintingBackend):
 
     def read(self, size: Optional[int] = -1) -> bytes:
         return self.dev.read(0x81, size)
+
+class BTSerialBackend():
+    def __init__(self, dev):
+        self.dev = dev
+        self.lock = threading.Lock()
+
+    @classmethod
+    def auto(cls, devPath: str):
+        dev = serial.Serial(
+            devPath,
+            baudrate=9600,
+            stopbits=serial.STOPBITS_ONE,
+            parity=serial.PARITY_NONE,
+            bytesize=8,
+            dsrdtr=False,
+            timeout=1
+        )
+        if dev is None:
+            raise OSError('Device not found')
+        return cls(dev)
+
+    def write(self, data: bytes):
+        self.dev.write(data)
+
+    def read(self, count: int) -> bytes:
+        data = self.dev.read(count)
+        return data
