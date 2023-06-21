@@ -9,38 +9,33 @@ Labelprinterkit's simple layout engine can be used to create simple labels:
 ```python
 from labelprinterkit.backends.usb import PyUSBBackend
 from labelprinterkit.printers import P750W
-from labelprinterkit.label import Label, Text
+from labelprinterkit.label import Label, Text, Row, Padding
 from labelprinterkit.job import Job
 from labelprinterkit.constants import MediaType, MediaSize
 
-# Define the layout of our label
-# We define a single row with two text items.
-# In real usage, you will probably want to change the font of the text.
-class MyLabel(Label):
-    items = [
-        [Text(pad_right=50), Text()]
-    ]
+# Create text for the label
 
-# Instantiate the label with specific data
-label = MyLabel("text1", "text2")
-page = labe.page()
+text1 = Text("First line", 'comic.ttf', padding=Padding(0, 0, 1, 0))
+text2 = Text("Some text", 'comic.ttf')
+text3 = Text("Other text", 'comic.ttf')
+
+# Insert Text into rows
+row1 = Row(45, text1)
+row2 = Row(25, text2, text3)
+
+# Create label with rows from above
+label = Label(row1, row2)
+
+# Create job with configuration and add label as page
 job = Job(MediaSize.W12, MediaType.LAMINATED_TAPE)
-job.add_page(page)
+job.add_page(label)
+
 # scan for a USB printer using the PyUSBBackend
 backend = PyUSBBackend()
 printer = P700(backend)
-# Print!
+
+# Print job
 printer.print(job)
-```
-
-Example of using a better font:
-
-```python
-from PIL import Image, ImageFont
-SIZE = 60
-font = ImageFont.truetype("FreeSans.ttf", SIZE)
-# Use it in the label template, e.g.
-Text(font, pad_right=50)
 ```
 
 To use a Bluetooth connection:

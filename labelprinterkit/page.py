@@ -1,8 +1,17 @@
 from abc import ABC
 from math import ceil
-from typing import TypeVar
+from typing import TypeVar, Self
+
+from PIL import Image, ImageChops
 
 from .constants import Resolution
+
+
+def image_to_bitmap(image: Image) -> bytes:
+    assert image.mode == "1"
+    image = image.transpose(Image.ROTATE_270).transpose(Image.FLIP_TOP_BOTTOM)
+    image = ImageChops.invert(image)
+    return image.tobytes(), image.size[0], image.size[1]
 
 
 class BasePage(ABC):
@@ -52,3 +61,8 @@ class Page(BasePage):
         self._length = length
         self._resolution = resolution
         super().__init__()
+
+    @classmethod
+    def from_image(cls, image: Image, resolution: Resolution = Resolution.LOW) -> Self:
+        bitmap, height, length = image_to_bitmap(image)
+        return cls(bitmap, height, length, resolution)
