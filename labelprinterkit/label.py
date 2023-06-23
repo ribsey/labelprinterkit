@@ -31,7 +31,7 @@ class Padding(NamedTuple):
 
 class Item(ABC):
     @abstractmethod
-    def render(self, height: int) -> Image:
+    def render(self) -> Image:
         ...
 
 
@@ -39,9 +39,10 @@ ItemType = TypeVar('ItemType', bound=Item)
 
 
 class Text(Item):
-    def __init__(self, text: str, font_path: str, font_index: int = 0, font_size: int | None = None,
+    def __init__(self, text: str, height: int, font_path: str, font_index: int = 0, font_size: int | None = None,
             padding: Padding = Padding(0, 0, 0, 0)):
         self.text = text
+        self.height = height
         self.font_path = font_path
         self.font_index = font_index
         self.font_size = font_size
@@ -50,21 +51,16 @@ class Text(Item):
             raise ValueError("Negative padding is not supported: {padding}")
         self.padding = padding
 
-    def render(self, height: int) -> Image:
-        iheight = height - self.padding.top - self.padding.bottom
+    def render(self) -> Image:
+        iheight = self.height - self.padding.top - self.padding.bottom
         if self.font_size is None:
             font_size = self._calc_font_size(iheight)
             logger.debug(f"text: {self.text}, calculated font size: {font_size}")
         else:
             font_size = self.font_size
         font = ImageFont.truetype(self.font_path, font_size, self.font_index)
-        text_x, text_y = font.getsize(self.text)
-        padded_size = (
-            text_x + self.padding.left + self.padding.right,
-            text_y + self.padding.top + self.padding.bottom,
-        )
-
-        image = Image.new("1", padded_size, "white")
+        text_x, _ = font.getsize(self.text)
+        image = Image.new("1", (self.padding.left + text_x + self.padding.right, self.height), "white")
         fimage = Image.new("1", font.getsize(self.text), "white")
         draw = ImageDraw.Draw(fimage)
         draw.text((0, 0), self.text, "black", font)
@@ -102,28 +98,38 @@ class Text(Item):
                 return test
 
 
-class Row:
-    def __init__(self, height: int, *items: ItemType):
+class Box:
+    def __init__(self, height: int, *items: ItemType, vertical: bool = False):
         self.height = height
         self.length = 0
         self.items = items
+        self._vertical = vertical
 
     def render(self) -> Image:
-        rendered_images = [item.render(self.height) for item in self.items]
-        length = sum([rendered_image.size[0] for rendered_image in rendered_images])
-        image = Image.new("1", (length, self.height), "white")
-        ypos = 0
-        for rendered_image in rendered_images:
-            image.paste(rendered_image, (ypos, 0))
-            ypos += rendered_image.size[0]
+        rendered_images = [item.render() for item in self.items]
+        if self._vertical:
+            length = max([rendered_image.size[0] for rendered_image in rendered_images])
+            assert self.height == sum([rendered_image.size[1] for rendered_image in rendered_images])
+            image = Image.new("1", (length, self.height), "white")
+            xpos = 0
+            for rendered_image in rendered_images:
+                image.paste(rendered_image, (0, xpos))
+                xpos += rendered_image.size[1]
+        else:
+            length = sum([rendered_image.size[0] for rendered_image in rendered_images])
+            image = Image.new("1", (length, self.height), "white")
+            ypos = 0
+            for rendered_image in rendered_images:
+                image.paste(rendered_image, (ypos, 0))
+                ypos += rendered_image.size[0]
         return image
 
 
 class Label(BasePage):
-    def __init__(self, *rows: Row):
-        self.rows = rows
+    def __init__(self, *boxes: Box):
+        self.boxes = boxes
 
-        rendered_images = [row.render() for row in self.rows]
+        rendered_images = [box.render() for box in self.boxes]
         length = max([rendered_image.size[0] for rendered_image in rendered_images])
         width = sum([rendered_image.size[1] for rendered_image in rendered_images])
         image = Image.new("1", (length, width), "white")
