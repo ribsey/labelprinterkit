@@ -16,7 +16,7 @@ def image_to_bitmap(image: Image) -> bytes:
 
 class BasePage(ABC):
     _bitmap: bytes
-    _height: int
+    _width: int
     _length: int
     _resolution: Resolution
 
@@ -30,8 +30,8 @@ class BasePage(ABC):
         return self._bitmap
 
     @property
-    def height(self):
-        return self._height
+    def width(self):
+        return self._width
 
     @property
     def length(self):
@@ -44,7 +44,7 @@ class BasePage(ABC):
     @property
     def _byte_per_line(self):
         if self.__byte_per_line is None:
-            self.__byte_per_line = ceil(self.height / 8)
+            self.__byte_per_line = ceil(self.width / 8)
         return self.__byte_per_line
 
     def __iter__(self):
@@ -54,7 +54,7 @@ class BasePage(ABC):
     @property
     def image(self) -> Image:
         if not self.__image:
-            image = Image.frombytes('1', (self._height, self.length), self._bitmap)
+            image = Image.frombytes('1', (self._width, self.length), self._bitmap)
             image = image.transpose(Image.FLIP_TOP_BOTTOM)
             image = image.transpose(Image.ROTATE_90)
             image = ImageChops.invert(image)
@@ -66,14 +66,14 @@ PageType = TypeVar('PageType', bound=BasePage)
 
 
 class Page(BasePage):
-    def __init__(self, bitmap: bytes, height: int, length: int,  resolution: Resolution = Resolution.LOW):
+    def __init__(self, bitmap: bytes, width: int, length: int, resolution: Resolution = Resolution.LOW):
         self._bitmap = bitmap
-        self._height = height
+        self._width = width
         self._length = length
         self._resolution = resolution
         super().__init__()
 
     @classmethod
     def from_image(cls, image: Image, resolution: Resolution = Resolution.LOW) -> Self:
-        bitmap, height, length = image_to_bitmap(image)
-        return cls(bitmap, height, length, resolution)
+        bitmap, width, length = image_to_bitmap(image)
+        return cls(bitmap, width, length, resolution)

@@ -31,7 +31,7 @@ class ErrorCodes(Enum):
 
 
 class TapeInfo(NamedTuple):
-    height: int
+    width: int
     length: int
     lmargin: int | None
     printarea: int | None

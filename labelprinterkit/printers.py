@@ -46,10 +46,7 @@ class Status:
         # assert data[5] == 0x00  # Reserved
         # assert data[6] == 0x00  # Reserved
         _data['errors'] = Error(data[8], data[9])
-        try:
-            _data['media_size'] = {x.value[0]: x for x in MediaSize}[int(data[10])]
-        except IndexError:
-            raise RuntimeError("Unsupported media size {data[10]}")
+        _data['media_width'] = int(data[10])
         try:
             _data['media_type'] = {x.value: x for x in MediaType}[int(data[11])]
         except IndexError:
@@ -163,7 +160,7 @@ class GenericPrinter(BasePrinter):
             raise RuntimeError('Resolution is not supported by this printer.')
 
         media_type = job.media_type.value.to_bytes(1, 'big')
-        media_size = job.media_size.value.height.to_bytes(1, 'big')
+        media_size = job.media_size.value.width.to_bytes(1, 'big')
         offset = job.media_size.value.lmargin
 
         various_mode = 0

@@ -125,16 +125,16 @@ class Label(BasePage):
 
         rendered_images = [row.render() for row in self.rows]
         length = max([rendered_image.size[0] for rendered_image in rendered_images])
-        height = sum([rendered_image.size[1] for rendered_image in rendered_images])
-        image = Image.new("1", (length, height), "white")
+        width = sum([rendered_image.size[1] for rendered_image in rendered_images])
+        image = Image.new("1", (length, width), "white")
         xpos = 0
         for rendered_image in rendered_images:
             image.paste(rendered_image, (0, xpos))
             xpos += rendered_image.size[1]
-        self._bitmap, self._height , self._length = image_to_bitmap(image)
+        self._bitmap, self._width , self._length = image_to_bitmap(image)
         self._resolution = Resolution.LOW
 
-        logger.debug(f"label height {self._height}")
+        logger.debug(f"label width {self._width}")
         logger.debug(f"label length {self._length}")
 
         super().__init__()

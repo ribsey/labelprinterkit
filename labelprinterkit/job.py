@@ -42,9 +42,9 @@ class Job:
         return len(self._pages)
 
     def add_page(self, page: PageType):
-        height = self.media_size.value.printarea
-        if page.height != height:
-            raise RuntimeError('Page height does not match media height')
+        width = self.media_size.value.printarea
+        if page.width != width:
+            raise RuntimeError('Page width does not match media width')
         if page.resolution != self.resolution:
             raise RuntimeError('Page resolution does not match media resolution')
         if self.resolution == Resolution.LOW:
