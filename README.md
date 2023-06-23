@@ -72,4 +72,4 @@ The following backends are currently supported:
  * Network connection via TCP
 
 The official source of this repository is at https://git.scc.kit.edu/scc-net/labelprinterkit.
-Pull requests and issues are also accepted on github at https://github.com/notafile/labelprinterkit.
+Pull requests and issues are also accepted on github at https://github.com/ogelpre/labelprinterkit.
