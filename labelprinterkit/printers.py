@@ -72,11 +72,11 @@ class Status:
         try:
             _data['tape_color'] = {x.value: x for x in TapeColor}[int(data[24])]
         except IndexError:
-            raise RuntimeError("Unknown notification {data[18]}")
+            raise RuntimeError("Unknown tape color {data[18]}")
         try:
             _data['text_color'] = {x.value: x for x in TextColor}[int(data[25])]
         except IndexError:
-            raise RuntimeError("Unknown notification {data[18]}")
+            raise RuntimeError("Unknown text color {data[18]}")
         # data[26:29]  # Hardware settings
         # data[30:31] Reserved
 
