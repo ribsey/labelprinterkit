@@ -12,9 +12,11 @@ pillow = "^9.5.0"
 pyusb = "^1.2.1"
 packbits = "^0.6"
 pyserial = {version = "^3.5", optional = true}
+qrcode = {version = "^7.4.2", optional = true, extras = ["pil"]}
 
 [tool.poetry.extras]
 bluetooth = ["pyserial"]
+qrcode = ["qrcode"]
 
 [build-system]
 requires = ["poetry-core"]

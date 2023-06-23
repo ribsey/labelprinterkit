@@ -4,6 +4,10 @@ from math import ceil
 from typing import TypeVar, NamedTuple
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
+try:
+    import qrcode
+except ImportError:
+    qrcode = None
 
 from .constants import Resolution
 from .page import BasePage, image_to_bitmap
@@ -96,6 +100,49 @@ class Text(Item):
                 lower = test
             else:
                 return test
+
+
+class QrCode(Item):
+    def __init__(self, width: int, data: str,
+                 error_correction: qrcode.constants.ERROR_CORRECT_L | qrcode.constants.ERROR_CORRECT_M |
+                                   qrcode.constants.ERROR_CORRECT_H | qrcode.constants.ERROR_CORRECT_Q
+                                    = qrcode.constants.ERROR_CORRECT_M,
+                 box_size: int | None = None, border: int = 0):
+        self._width = width
+        self._data = data
+        self._error_correction = error_correction
+        self._box_size = box_size
+        self._border = border
+
+    def render(self) -> Image:
+        if self._box_size is None:
+            box_size = 2
+        else:
+            box_size = self._box_size
+        probe_box_size = box_size
+        qr_image = None
+        while True:
+            logger.debug(f"qrcode: {self._data}, probe_box_size: {probe_box_size}")
+            qr = qrcode.QRCode(error_correction=self._error_correction, box_size=probe_box_size, border=self._border)
+            qr.add_data(self._data)
+            new_image = qr.make_image()._img
+            if new_image.size[0] <= self._width:
+                qr_image = new_image
+                probe_box_size += 1
+            elif qr_image is None:
+                raise RuntimeError("Data does not fit in qrcode")
+            else:
+                break
+            if self._box_size is not None:
+                break
+
+        logger.debug(f"qrcode: {self._data}, final box_size: {probe_box_size - 1}")
+
+        rest = self._width - qr_image.size[1]
+        image = Image.new("1", (qr_image.size[0], self._width), "white")
+        image.paste(qr_image, (0, rest // 2))
+
+        return image
 
 
 class Box:
