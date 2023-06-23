@@ -22,6 +22,7 @@ class BasePage(ABC):
 
     def __init__(self):
         self.__byte_per_line = None
+        self.__image = None
         assert self._byte_per_line * self.length == len(self.bitmap)
 
     @property
@@ -49,6 +50,16 @@ class BasePage(ABC):
     def __iter__(self):
         for i in range(0, len(self.bitmap), self._byte_per_line):
             yield self.bitmap[i:i + self._byte_per_line]
+
+    @property
+    def image(self) -> Image:
+        if not self.__image:
+            image = Image.frombytes('1', (self._height, self.length), self._bitmap)
+            image = image.transpose(Image.FLIP_TOP_BOTTOM)
+            image = image.transpose(Image.ROTATE_90)
+            image = ImageChops.invert(image)
+            self.__image = image
+        return self.__image
 
 
 PageType = TypeVar('PageType', bound=BasePage)
