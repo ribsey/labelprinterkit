@@ -1,5 +1,7 @@
-import serial
-
+try:
+    import serial
+except ImportError:
+    serial = None
 from . import BiDirectionalBackend
 
 

@@ -93,7 +93,7 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 name = "pyserial"
 version = "3.5"
 description = "Python Serial Port Extension"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "pyserial-3.5-py2.py3-none-any.whl", hash = "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0"},
@@ -114,7 +114,10 @@ files = [
     {file = "pyusb-1.2.1.tar.gz", hash = "sha256:a4cc7404a203144754164b8b40994e2849fde1cfff06b08492f12fff9d9de7b9"},
 ]
 
+[extras]
+bluetooth = ["pyserial"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "99719564fa704dc412228464e4c58c5d0c23be65e05e9e928bb7cd5928a2b12e"
+content-hash = "05feb94bf7f952072c2291774748f537eeb3a5178fe21af682e4ea3b029ff90a"
