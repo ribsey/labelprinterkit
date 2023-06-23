@@ -12,6 +12,8 @@ from labelprinterkit.printers import P750W
 from labelprinterkit.label import Label, Text, Row, Padding
 from labelprinterkit.job import Job
 from labelprinterkit.constants import MediaType, MediaSize
+from labelprinterkit.page import Page
+from PIL import Image
 
 # Create text for the label
 
@@ -29,6 +31,11 @@ label = Label(row1, row2)
 # Create job with configuration and add label as page
 job = Job(MediaSize.W12, MediaType.LAMINATED_TAPE)
 job.add_page(label)
+
+# Creat a page from a Pillow image and add it to the job
+image = Image.new("1", (70, 200), "white")
+page = Page.from_image(image)
+job.add_page(page)
 
 # scan for a USB printer using the PyUSBBackend
 backend = PyUSBBackend()
