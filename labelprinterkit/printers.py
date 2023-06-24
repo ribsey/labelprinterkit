@@ -6,14 +6,14 @@ from typing import TypeVar
 
 import packbits
 
-from .backends import BiDirectionalBackend, UniDirectionalBackend
-from .constants import Resolution, ErrorCodes, MediaSize, MediaType, StatusCodes, NotificationCodes, TapeColor, \
+from .backends import BaseBackend
+from .constants import Resolution, ErrorCodes, MediaType, StatusCodes, NotificationCodes, TapeColor, \
     TextColor, VariousModesSettings, AdvancedModeSettings
 from .job import Job
 
 logger = getLogger(__name__)
 
-BackendType = TypeVar('BackendType', bound=BiDirectionalBackend | UniDirectionalBackend)
+BackendType = TypeVar('BackendType', bound=BaseBackend)
 
 
 class Error:
