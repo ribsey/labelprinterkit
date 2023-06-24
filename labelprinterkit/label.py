@@ -172,18 +172,9 @@ class Box:
 
 
 class Label(BasePage):
-    def __init__(self, *items: ItemType):
-        self.items = items
-
-        rendered_images = [box.render() for box in self.items]
-        length = max([rendered_image.size[0] for rendered_image in rendered_images])
-        width = sum([rendered_image.size[1] for rendered_image in rendered_images])
-        image = Image.new("1", (length, width), "white")
-        xpos = 0
-        for rendered_image in rendered_images:
-            image.paste(rendered_image, (0, xpos))
-            xpos += rendered_image.size[1]
-        self._bitmap, self._width, self._length = image_to_bitmap(image)
+    def __init__(self, item: ItemType):
+        self.item = item
+        self._bitmap, self._width, self._length = image_to_bitmap(self.item.render())
         self._resolution = Resolution.LOW
 
         logger.debug(f"label width {self._width}")
