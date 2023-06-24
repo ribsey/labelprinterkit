@@ -16,8 +16,6 @@ from labelprinterkit.printers import P750W
 from labelprinterkit.label import Label, Box, Text, QrCode, Padding
 from labelprinterkit.job import Job
 from labelprinterkit.constants import MediaType, MediaSize
-from labelprinterkit.page import Page
-from PIL import Image
 
 # The label will be created for a 12mm band. The 12mm has 70 pixel/points width.
 # So let's create a QR code with 70 pixels width.
