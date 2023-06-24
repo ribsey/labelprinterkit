@@ -43,8 +43,8 @@ ItemType = TypeVar('ItemType', bound=Item)
 
 
 class Text(Item):
-    def __init__(self, text: str, height: int, font_path: str, font_index: int = 0, font_size: int | None = None,
-            padding: Padding = Padding(0, 0, 0, 0)):
+    def __init__(self, height: int, text: str, font_path: str, font_index: int = 0, font_size: int | None = None,
+                 padding: Padding = Padding(0, 0, 0, 0)):
         self.text = text
         self.height = height
         self.font_path = font_path

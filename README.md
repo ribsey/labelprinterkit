@@ -17,9 +17,9 @@ from PIL import Image
 
 # Create text for the label
 
-text1 = Text("First line", 45, 'comic.ttf', padding=Padding(0, 0, 1, 0))
-text2 = Text("Some text", 25, 'comic.ttf')
-text3 = Text("Other text", 25, 'comic.ttf')
+text1 = Text(45, "First line", 'comic.ttf', padding=Padding(0, 0, 1, 0))
+text2 = Text(25, "Some text", 'comic.ttf')
+text3 = Text(25, "Other text", 'comic.ttf')
 
 # Insert Text into boxes
 box1 = Box(45, text1)
