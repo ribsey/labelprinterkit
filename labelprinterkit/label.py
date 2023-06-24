@@ -124,7 +124,7 @@ class QrCode(Item):
             logger.debug(f"qrcode: {self._data}, probe_box_size: {probe_box_size}")
             qr = qrcode.QRCode(error_correction=self._error_correction, box_size=probe_box_size, border=self._border)
             qr.add_data(self._data)
-            new_image = qr.make_image()._img
+            new_image = qr.make_image()
             if new_image.size[0] <= self._width:
                 qr_image = new_image
                 probe_box_size += 1
