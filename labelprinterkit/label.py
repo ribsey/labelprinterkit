@@ -172,10 +172,10 @@ class Box:
 
 
 class Label(BasePage):
-    def __init__(self, *boxes: Box):
-        self.boxes = boxes
+    def __init__(self, *items: ItemType):
+        self.items = items
 
-        rendered_images = [box.render() for box in self.boxes]
+        rendered_images = [box.render() for box in self.items]
         length = max([rendered_image.size[0] for rendered_image in rendered_images])
         width = sum([rendered_image.size[1] for rendered_image in rendered_images])
         image = Image.new("1", (length, width), "white")
