@@ -166,6 +166,9 @@ class GenericPrinter(BasePrinter):
         various_mode = 0
         if job.auto_cut:
             various_mode = various_mode | VariousModesSettings.AUTO_CUT.value
+            auto_cut = True
+        else:
+            auto_cut = False
         if job.mirror_printing:
             various_mode = various_mode | VariousModesSettings.MIRROR_PRINTING.value
         various_mode = various_mode.to_bytes(1, 'big')
@@ -196,8 +199,7 @@ class GenericPrinter(BasePrinter):
             # b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00'
             information_command = b'\x1Biz\x86' + media_type + media_size + b'\x00\x00\x00\00\x00\x00'
             self._backend.write(information_command)
-
-            if i == 0:
+            if i == 0 and auto_cut:
                 # Ugly workaround
                 # Print information command a second time forces cutting after first page.
                 # No idea why this is needed, but it works
@@ -214,8 +216,9 @@ class GenericPrinter(BasePrinter):
             # margin
             self._backend.write(b'\x1bid' + margin)
 
-            # Configure after how many pages a cut should be done
-            self._backend.write(b'\x1BiA' + cut_each)
+            if auto_cut:
+                # Configure after how many pages a cut should be done
+                self._backend.write(b'\x1BiA' + cut_each)
 
             # Enable compression mode
             self._backend.write(b'M\x02')
