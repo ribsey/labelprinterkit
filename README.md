@@ -8,7 +8,7 @@ Labelprinterkit's simple layout engine can be used to create simple labels:
 
 ```python
 from labelprinterkit.backends.usb import PyUSBBackend
-from labelprinterkit.printers import P750W
+from labelprinterkit.printers import P700
 from labelprinterkit.label import Label, Text, Box, Padding
 from labelprinterkit.job import Job
 from labelprinterkit.constants import MediaType, MediaSize
@@ -17,9 +17,9 @@ from PIL import Image
 
 # Create text for the label
 
-text1 = Text("First line", 'comic.ttf', padding=Padding(0, 0, 1, 0))
-text2 = Text("Some text", 'comic.ttf')
-text3 = Text("Other text", 'comic.ttf')
+text1 = Text("First line", 45, 'comic.ttf', padding=Padding(0, 0, 1, 0))
+text2 = Text("Some text", 25, 'comic.ttf')
+text3 = Text("Other text", 25, 'comic.ttf')
 
 # Insert Text into boxes
 box1 = Box(45, text1)
@@ -32,7 +32,7 @@ label = Label(box1, box2)
 job = Job(MediaSize.W12, MediaType.LAMINATED_TAPE)
 job.add_page(label)
 
-# Creat a page from a Pillow image and add it to the job
+# Create a page from a Pillow image and add it to the job
 image = Image.new("1", (70, 200), "white")
 page = Page.from_image(image)
 job.add_page(page)
