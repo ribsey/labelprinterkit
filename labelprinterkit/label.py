@@ -105,8 +105,7 @@ class Text(Item):
 class QrCode(Item):
     def __init__(self, width: int, data: str,
                  error_correction: qrcode.constants.ERROR_CORRECT_L | qrcode.constants.ERROR_CORRECT_M |
-                                   qrcode.constants.ERROR_CORRECT_H | qrcode.constants.ERROR_CORRECT_Q
-                                    = qrcode.constants.ERROR_CORRECT_M,
+                 qrcode.constants.ERROR_CORRECT_H | qrcode.constants.ERROR_CORRECT_Q = qrcode.constants.ERROR_CORRECT_M,
                  box_size: int | None = None, border: int = 0):
         self._width = width
         self._data = data
@@ -184,7 +183,7 @@ class Label(BasePage):
         for rendered_image in rendered_images:
             image.paste(rendered_image, (0, xpos))
             xpos += rendered_image.size[1]
-        self._bitmap, self._width , self._length = image_to_bitmap(image)
+        self._bitmap, self._width, self._length = image_to_bitmap(image)
         self._resolution = Resolution.LOW
 
         logger.debug(f"label width {self._width}")
