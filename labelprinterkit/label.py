@@ -109,7 +109,7 @@ class Text(Item):
 
 class QrCode(Item):
     def __init__(self, width: int, data: str,
-                 error_correction: Optional[ERROR_CORRECT_M | ERROR_CORRECT_H | ERROR_CORRECT_Q] = ERROR_CORRECT_M,
+                 error_correction: Optional[ERROR_CORRECT_M | ERROR_CORRECT_H | ERROR_CORRECT_Q] = None,
                  box_size: int | None = None, border: int = 0):
         self._width = width
         self._data = data
@@ -124,22 +124,31 @@ class QrCode(Item):
             box_size = self._box_size
         probe_box_size = box_size
         qr_image = None
-        while True:
-            logger.debug(f"qrcode: {self._data}, probe_box_size: {probe_box_size}")
-            qr = _QRCode(error_correction=self._error_correction, box_size=probe_box_size, border=self._border)
-            qr.add_data(self._data)
-            new_image = qr.make_image()
-            if new_image.size[0] <= self._width:
-                qr_image = new_image
-                probe_box_size += 1
-            elif qr_image is None:
-                raise RuntimeError("Data does not fit in qrcode")
-            else:
+        if self._error_correction is None:
+            error_corrections = [ERROR_CORRECT_Q, ERROR_CORRECT_H, ERROR_CORRECT_M, ERROR_CORRECT_L]
+        else:
+            error_corrections = [self._error_correction]
+        for error_correction in error_corrections:
+            while True:
+                logger.debug(f"qrcode: {self._data}, probe_box_size: {probe_box_size}, EC: {error_correction}")
+                qr = _QRCode(error_correction=error_correction, box_size=probe_box_size, border=self._border)
+                qr.add_data(self._data)
+                new_image = qr.make_image()
+                if new_image.size[0] <= self._width:
+                    qr_image = new_image
+                    probe_box_size += 1
+                elif qr_image is None:
+                    break
+                else:
+                    break
+                if self._box_size is not None:
+                    break
+            if qr_image:
                 break
-            if self._box_size is not None:
-                break
+        if not qr_image:
+            raise RuntimeError("Data does not fit in qrcode")
 
-        logger.debug(f"qrcode: {self._data}, final box_size: {probe_box_size - 1}")
+        logger.debug(f"qrcode: {self._data}, final box_size: {probe_box_size - 1}, EC: {error_correction}")
 
         rest = self._width - qr_image.size[1]
         image = Image.new("1", (qr_image.size[0], self._width), "white")
