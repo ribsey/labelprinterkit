@@ -193,5 +193,5 @@ qrcode = ["qrcode"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "8bfb82f3646412a81aa8920511db33c776739ea492e96cb21d102d840f7e9bd3"
+python-versions = "^3.9"
+content-hash = "996f056291c7517d7df7b2fbd5fce4cd429e4c948ac07631f05be1da43faf202"
