@@ -11,8 +11,8 @@ except ImportError:
     _QRcode = None
     ERROR_CORRECT_L = 1
     ERROR_CORRECT_M = 0
-    ERROR_CORRECT_H = 2
     ERROR_CORRECT_Q = 3
+    ERROR_CORRECT_H = 2
 
 from .constants import Resolution
 from .page import BasePage, image_to_bitmap
@@ -125,7 +125,7 @@ class QrCode(Item):
         probe_box_size = box_size
         qr_image = None
         if self._error_correction is None:
-            error_corrections = [ERROR_CORRECT_Q, ERROR_CORRECT_H, ERROR_CORRECT_M, ERROR_CORRECT_L]
+            error_corrections = [ERROR_CORRECT_H, ERROR_CORRECT_Q, ERROR_CORRECT_M, ERROR_CORRECT_L]
         else:
             error_corrections = [self._error_correction]
         for error_correction in error_corrections:
