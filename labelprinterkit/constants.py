@@ -40,7 +40,7 @@ class TapeInfo(NamedTuple):
 
 class MediaSize(Enum):
     NO_MEDIA = TapeInfo(0, 0, None, None, None)
-    W3_5 = TapeInfo(4, 0, 48, 32, 48)
+    W3_5 = TapeInfo(4, 0, 52, 24, 52)
     W6 = TapeInfo(6, 0, 48, 32, 48)
     W9 = TapeInfo(9, 0, 39, 50, 39)
     W12 = TapeInfo(12, 0, 29, 70, 29)
