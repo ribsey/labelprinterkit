@@ -1,13 +1,18 @@
 from abc import ABC, abstractmethod
 from logging import getLogger
 from math import ceil
-from typing import TypeVar, NamedTuple
+from typing import TypeVar, NamedTuple, Optional
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 try:
-    import qrcode
+    from qrcode import QRCode as _QRCode
+    from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_H, ERROR_CORRECT_Q
 except ImportError:
-    qrcode = None
+    _QRcode = None
+    ERROR_CORRECT_L = 1
+    ERROR_CORRECT_M = 0
+    ERROR_CORRECT_H = 2
+    ERROR_CORRECT_Q = 3
 
 from .constants import Resolution
 from .page import BasePage, image_to_bitmap
@@ -104,8 +109,7 @@ class Text(Item):
 
 class QrCode(Item):
     def __init__(self, width: int, data: str,
-                 error_correction: qrcode.constants.ERROR_CORRECT_L | qrcode.constants.ERROR_CORRECT_M |
-                 qrcode.constants.ERROR_CORRECT_H | qrcode.constants.ERROR_CORRECT_Q = qrcode.constants.ERROR_CORRECT_M,
+                 error_correction: Optional[ERROR_CORRECT_M | ERROR_CORRECT_H | ERROR_CORRECT_Q] = ERROR_CORRECT_M,
                  box_size: int | None = None, border: int = 0):
         self._width = width
         self._data = data
@@ -122,7 +126,7 @@ class QrCode(Item):
         qr_image = None
         while True:
             logger.debug(f"qrcode: {self._data}, probe_box_size: {probe_box_size}")
-            qr = qrcode.QRCode(error_correction=self._error_correction, box_size=probe_box_size, border=self._border)
+            qr = _QRCode(error_correction=self._error_correction, box_size=probe_box_size, border=self._border)
             qr.add_data(self._data)
             new_image = qr.make_image()
             if new_image.size[0] <= self._width:
