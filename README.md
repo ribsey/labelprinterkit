@@ -11,7 +11,7 @@ from labelprinterkit.backends.usb import PyUSBBackend
 from labelprinterkit.printers import P700
 from labelprinterkit.label import Label, Text, Box, Padding
 from labelprinterkit.job import Job
-from labelprinterkit.constants import MediaType, MediaSize
+from labelprinterkit.constants import MediaType, Media
 from labelprinterkit.page import Page
 from PIL import Image
 
@@ -29,7 +29,7 @@ box2 = Box(25, text2, text3)
 label = Label(box1, box2)
 
 # Create job with configuration and add label as page
-job = Job(MediaSize.W12, MediaType.LAMINATED_TAPE)
+job = Job(Media.W12, MediaType.LAMINATED_TAPE)
 job.add_page(label)
 
 # Create a page from a Pillow image and add it to the job

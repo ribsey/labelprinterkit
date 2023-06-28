@@ -1,13 +1,10 @@
 from .page import PageType
-from .constants import MediaType, MediaSize, Resolution
-
-invalid_media_type = (MediaType.NO_MEDIA, MediaType.INCOMPATIBLE_TAPE)
+from .constants import MediaType, Media, Resolution
 
 
 class Job:
     def __init__(self,
-                 media_size: MediaSize | None = None,
-                 media_type: MediaType | None = None,
+                 media: Media,
                  auto_cut: bool = True,
                  mirror_printing: bool = False,
                  half_cut: bool = False,
@@ -17,11 +14,7 @@ class Job:
                  resolution: Resolution = Resolution.LOW
                  ):
 
-        self.media_size = media_size
-
-        if media_type in invalid_media_type:
-            ValueError(f"Media type {media_type} is invalid")
-        self.media_type = media_type
+        self.media = media
 
         self.auto_cut = auto_cut
         self.mirror_printing = mirror_printing
@@ -42,7 +35,7 @@ class Job:
         return len(self._pages)
 
     def add_page(self, page: PageType):
-        width = self.media_size.value.printarea
+        width = self.media.value.printarea
         if page.width != width:
             raise RuntimeError('Page width does not match media width')
         if page.resolution != self.resolution:

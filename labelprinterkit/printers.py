@@ -8,7 +8,7 @@ import packbits
 
 from .backends import BaseBackend, UniDirectionalBackend
 from .constants import Resolution, ErrorCodes, MediaType, StatusCodes, NotificationCodes, TapeColor, \
-    TextColor, VariousModesSettings, AdvancedModeSettings
+    TextColor, VariousModesSettings, AdvancedModeSettings, Media
 from .job import Job
 
 logger = getLogger(__name__)
@@ -81,15 +81,22 @@ class Status:
         # data[30:31] Reserved
 
         self._data = _data
+        self._media = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Status {}>".format(self._data)
 
     def __getattr__(self, attr):
         return self._data[attr]
 
-    def ready(self):
+    def ready(self) -> bool:
         return not self.errors.any()
+
+    @property
+    def media(self) -> Media:
+        if self._media is None:
+            self._media = Media.get_media(self.media_width, self.media_type)
+        return self._media
 
 
 class BasePrinter(ABC):
@@ -159,12 +166,15 @@ class GenericPrinter(BasePrinter):
 
         self.reset()
 
+        if job.media in (Media.NO_MEDIA, Media.UNSUPPORTED_MEDIA):
+            raise RuntimeError('Unsupported Media')
+
         if job.resolution not in self._SUPPORTED_RESOLUTIONS:
             raise RuntimeError('Resolution is not supported by this printer.')
 
-        media_type = job.media_type.value.to_bytes(1, 'big')
-        media_size = job.media_size.value.width.to_bytes(1, 'big')
-        offset = job.media_size.value.lmargin
+        media_type = job.media.value.media_type.value.to_bytes(1, 'big')
+        media_size = job.media.value.width.to_bytes(1, 'big')
+        offset = job.media.value.lmargin
 
         various_mode = 0
         if job.auto_cut:

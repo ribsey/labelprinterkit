@@ -30,24 +30,6 @@ class ErrorCodes(Enum):
     OVERHEATING = 0x2000
 
 
-class TapeInfo(NamedTuple):
-    width: int
-    length: int
-    lmargin: int | None
-    printarea: int | None
-    rmargin: int | None
-
-
-class MediaSize(Enum):
-    NO_MEDIA = TapeInfo(0, 0, None, None, None)
-    W3_5 = TapeInfo(4, 0, 52, 24, 52)
-    W6 = TapeInfo(6, 0, 48, 32, 48)
-    W9 = TapeInfo(9, 0, 39, 50, 39)
-    W12 = TapeInfo(12, 0, 29, 70, 29)
-    W18 = TapeInfo(18, 0, 8, 112, 8)
-    W24 = TapeInfo(24, 0, 0, 128, 0)
-
-
 class MediaType(Enum):
     NO_MEDIA = 0x00
     LAMINATED_TAPE = 0x01
@@ -55,6 +37,34 @@ class MediaType(Enum):
     HEATSHRINK_TUBE_21 = 0x11
     HEATSHRINK_TUBE_31 = 0x17
     INCOMPATIBLE_TAPE = 0xFF
+
+
+class TapeInfo(NamedTuple):
+    width: int
+    length: int
+    lmargin: int | None
+    printarea: int | None
+    rmargin: int | None
+    media_type: MediaType | None
+
+
+class Media(Enum):
+    UNSUPPORTED_MEDIA = TapeInfo(0, 0, None, None, None, None)
+    NO_MEDIA = TapeInfo(0, 0, None, None, None, None)
+    W3_5 = TapeInfo(4, 0, 52, 24, 52, MediaType.LAMINATED_TAPE)
+    W6 = TapeInfo(6, 0, 48, 32, 48, MediaType.LAMINATED_TAPE)
+    W9 = TapeInfo(9, 0, 39, 50, 39, MediaType.LAMINATED_TAPE)
+    W12 = TapeInfo(12, 0, 29, 70, 29, MediaType.LAMINATED_TAPE)
+    W18 = TapeInfo(18, 0, 8, 112, 8, MediaType.LAMINATED_TAPE)
+    W24 = TapeInfo(24, 0, 0, 128, 0, MediaType.LAMINATED_TAPE)
+
+    @classmethod
+    def get_media(cls, width: int, media_type: MediaType):
+        medias = [media_size for media_size in cls
+                  if media_size.value.width == width and media_size.value.media_type == media_type]
+        if not medias:
+            return cls.UNSUPPORTED_MEDIA
+        return medias[0]
 
 
 class StatusCodes(Enum):
