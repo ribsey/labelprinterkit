@@ -6,7 +6,7 @@ from typing import TypeVar
 
 import packbits
 
-from .backends import BaseBackend
+from .backends import BaseBackend, UniDirectionalBackend
 from .constants import Resolution, ErrorCodes, MediaType, StatusCodes, NotificationCodes, TapeColor, \
     TextColor, VariousModesSettings, AdvancedModeSettings
 from .job import Job
@@ -138,11 +138,14 @@ class GenericPrinter(BasePrinter):
         self._backend.write(b'\x1b@')  # Initialize command 1b 40
 
     def get_status(self) -> Status:
-        if not hasattr(self._backend, 'read'):
+        if hasattr(self._backend, 'get_status'):
+            data = self._backend.get_status()
+        elif isinstance(self._backend, UniDirectionalBackend):
             raise RuntimeError("Backend is unidirectional")
-        self.reset()
-        self._backend.write(b'\x1BiS')
-        data = self._backend.read(32)
+        else:
+            self.reset()
+            self._backend.write(b'\x1BiS')
+            data = self._backend.read(32)
         if not data:
             raise IOError("No Response from printer")
 

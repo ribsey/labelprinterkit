@@ -14,10 +14,14 @@ packbits = "^0.6"
 pyserial = {version = "^3.5", optional = true}
 qrcode = {version = "^7.4.2", optional = true, extras = ["pil"]}
 setuptools = "^68.0.0"
+pysnmp = {version = "^4.4.12", optional = true}
+#pin pyasn because pysnmp does not work with newer versions
+pyasn1 = { version = "^0.4.8", optional = true}
 
 [tool.poetry.extras]
 bluetooth = ["pyserial"]
 qrcode = ["qrcode"]
+snmp = ["pysnmp", "pyasn1"]
 
 [build-system]
 requires = ["poetry-core"]
