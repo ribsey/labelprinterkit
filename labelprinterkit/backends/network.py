@@ -40,6 +40,8 @@ class TCPBackend(UniDirectionalBackend):
 
 class NetworkBackend(TCPBackend):
     def __init__(self, host, port=9100, timeout=10, snmp_community='public', snmp_port=161):
+        if getCmd is None:
+            raise RuntimeError('Bidirectional network communication is not supported. Pacakge pysnmp is missing.')
         self._snmp_community = snmp_community
         self._snmp_port = snmp_port
         super().__init__(host, port, timeout)

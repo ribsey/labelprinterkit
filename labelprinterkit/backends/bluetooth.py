@@ -7,6 +7,8 @@ from . import BiDirectionalBackend
 
 class BTSerialBackend(BiDirectionalBackend):
     def __init__(self, dev_path: str):
+        if serial is None:
+            raise RuntimeError('Bluetooth is not supported. Pacakge serial is missing.')
         dev = serial.Serial(
             dev_path,
             baudrate=9600,

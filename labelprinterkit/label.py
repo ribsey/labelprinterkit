@@ -111,6 +111,8 @@ class QRCode(Item):
     def __init__(self, width: int, data: str,
                  error_correction: Optional[ERROR_CORRECT_M | ERROR_CORRECT_H | ERROR_CORRECT_Q] = None,
                  box_size: int | None = None, border: int = 0):
+        if _QRCode is None:
+            raise RuntimeError('No QR code support. Package qrcode is not installed.')
         self._width = width
         self._data = data
         self._error_correction = error_correction
