@@ -7,11 +7,19 @@ from PIL import Image, ImageChops
 from .constants import Resolution
 
 
-def image_to_bitmap(image: Image) -> bytes:
+def image_to_bitmap(image: Image) -> (bytes, int, int):
     assert image.mode == "1"
     image = image.transpose(Image.ROTATE_270).transpose(Image.FLIP_TOP_BOTTOM)
     image = ImageChops.invert(image)
     return image.tobytes(), image.size[0], image.size[1]
+
+
+def bitmap_to_image(bitmap: bytes, width: int, length: int ) -> bytes:
+    image = Image.frombytes('1', (width, length), bitmap)
+    image = image.transpose(Image.FLIP_TOP_BOTTOM)
+    image = image.transpose(Image.ROTATE_90)
+    image = ImageChops.invert(image)
+    return image
 
 
 class BasePage(ABC):
@@ -54,11 +62,7 @@ class BasePage(ABC):
     @property
     def image(self) -> Image:
         if not self.__image:
-            image = Image.frombytes('1', (self._width, self.length), self._bitmap)
-            image = image.transpose(Image.FLIP_TOP_BOTTOM)
-            image = image.transpose(Image.ROTATE_90)
-            image = ImageChops.invert(image)
-            self.__image = image
+            self.__image = bitmap_to_image(self._bitmap, self._width, self.length)
         return self.__image
 
 
