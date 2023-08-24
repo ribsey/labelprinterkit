@@ -1,3 +1,4 @@
+from __future__ import annotations
 from .page import PageType
 from .constants import MediaType, Media, Resolution
 

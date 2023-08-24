@@ -1,20 +1,21 @@
+from __future__ import annotations
 from abc import ABC
 from math import ceil
-from typing import TypeVar, Self
+from typing import TypeVar, Tuple
 
 from PIL import Image, ImageChops
 
 from .constants import Resolution
 
 
-def image_to_bitmap(image: Image) -> (bytes, int, int):
+def image_to_bitmap(image: Image) -> Tuple[bytes, int, int]:
     assert image.mode == "1"
     image = image.transpose(Image.ROTATE_270).transpose(Image.FLIP_TOP_BOTTOM)
     image = ImageChops.invert(image)
     return image.tobytes(), image.size[0], image.size[1]
 
 
-def bitmap_to_image(bitmap: bytes, width: int, length: int ) -> bytes:
+def bitmap_to_image(bitmap: bytes, width: int, length: int) -> Image:
     image = Image.frombytes('1', (width, length), bitmap)
     image = image.transpose(Image.FLIP_TOP_BOTTOM)
     image = image.transpose(Image.ROTATE_90)
@@ -78,6 +79,6 @@ class Page(BasePage):
         super().__init__()
 
     @classmethod
-    def from_image(cls, image: Image, resolution: Resolution = Resolution.LOW) -> Self:
+    def from_image(cls, image: Image, resolution: Resolution = Resolution.LOW) -> Page:
         bitmap, width, length = image_to_bitmap(image)
         return cls(bitmap, width, length, resolution)
