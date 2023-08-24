@@ -131,6 +131,7 @@ class QRCode(Item):
             error_corrections = [ERROR_CORRECT_H, ERROR_CORRECT_Q, ERROR_CORRECT_M, ERROR_CORRECT_L]
         else:
             error_corrections = [self._error_correction]
+        error_correction = None
         for error_correction in error_corrections:
             while True:
                 logger.debug(f"qrcode: {self._data}, probe_box_size: {probe_box_size}, EC: {error_correction}")
@@ -160,7 +161,7 @@ class QRCode(Item):
         return image
 
 
-class Box:
+class Box(Item):
     def __init__(self, height: int, *items: ItemType, vertical: bool = False, left_padding: int = 0):
         self.height = height
         self.items = items
@@ -220,7 +221,7 @@ class Flag(BasePage):
 
         white_spacing = (spacing - line_length) // 2
 
-        #spacing_image = Image.new("1", ((spacing - line_length) // 2, height), "white")
+        # spacing_image = Image.new("1", ((spacing - line_length) // 2, height), "white")
         rendered_images.insert(1, line_image)
         positions = [0, image_max_length + white_spacing, line_length + white_spacing]
 

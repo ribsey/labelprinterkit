@@ -37,7 +37,7 @@ class Error:
 
 class Status:
     def __init__(self, data: bytes) -> None:
-        _data = {}
+        _data = dict()
         # assert data[0] == 0x80  # Print head mark
         # assert data[1] == 0x20  # Size
         # assert data[2] == 0x42  # Brother code

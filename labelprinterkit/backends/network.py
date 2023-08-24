@@ -52,9 +52,9 @@ class NetworkBackend(TCPBackend):
         remote_address = self._sock.getpeername()[0]
 
         if self._sock.family == socket.AF_INET6:
-            transport = Udp6TransportTarget((remote_address, 161), timeout = self._timeout)
+            transport = Udp6TransportTarget((remote_address, 161), timeout=self._timeout)
         else:
-            transport = UdpTransportTarget((remote_address, 161), timeout = self._timeout)
+            transport = UdpTransportTarget((remote_address, 161), timeout=self._timeout)
 
         iterator = getCmd(
             SnmpEngine(),
@@ -64,10 +64,9 @@ class NetworkBackend(TCPBackend):
             ObjectType(ObjectIdentity('.1.3.6.1.4.1.2435.3.3.9.1.6.1.0'))
             )
 
-        error_indication, _, _, vars = next(iterator)
+        error_indication, _, _, variables = next(iterator)
         if error_indication:
             return None
         else:
-            from pprint import pprint
-            status_data = bytes(vars[0][1])
+            status_data = bytes(variables[0][1])
             return status_data
