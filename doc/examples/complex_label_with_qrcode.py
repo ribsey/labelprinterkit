@@ -19,7 +19,7 @@ from labelprinterkit.constants import Media
 
 # The label will be created for a 12mm band. The 12mm has 70 pixel/points width.
 # So let's create a QR code with 70 pixels width.
-qrcode = QrCode(70, "https://pypi.org/project/labelprinterkit/")
+qrcode = QRCode(70, "https://pypi.org/project/labelprinterkit/")
 
 # Create text for the label
 # The upper text is 25 pixels height and the lower text is 45 pixels height.
