@@ -268,3 +268,7 @@ class H500(GenericPrinter):
 
 class E500(H500):
     pass
+
+
+class E550W(P750W):
+    pass
