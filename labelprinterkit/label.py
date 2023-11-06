@@ -205,7 +205,6 @@ class Flag(BasePage):
         rendered_images = [item1.render(), item2.render()]
         image_max_length = max([rendered_image.size[0] for rendered_image in rendered_images])
         length = 2*image_max_length + spacing
-        print(length)
         height = max([rendered_image.size[1] for rendered_image in rendered_images])
 
         line_length = 2 + spacing % 2
@@ -229,10 +228,7 @@ class Flag(BasePage):
         ypos = 0
         for rendered_image, position in zip(rendered_images, positions):
             ypos += position
-            print(position)
-            print(image)
             image.paste(rendered_image, (ypos, 0))
-        print(ypos)
         self._bitmap, self._width, self._length = image_to_bitmap(image)
         self._resolution = Resolution.LOW
 
