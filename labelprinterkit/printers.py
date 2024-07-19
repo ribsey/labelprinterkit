@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from logging import getLogger
 import struct
 from typing import TypeVar
+import time
 
 import packbits
 
@@ -98,6 +99,11 @@ class Status:
         if self._media is None:
             self._media = Media.get_media(self.media_width, self.media_type)
         return self._media
+    
+    @property
+    def status(self) -> Media:
+        if self._data['status'] is not None:
+            return self._data['status']
 
 
 class BasePrinter(ABC):
@@ -248,9 +254,19 @@ class GenericPrinter(BasePrinter):
             if i < len(job) - 1:
                 self._backend.write(b'\x0C')
 
+                while not self.__is_print_finished(page.length*1000):
+                    pass
+
         # end page
         self._backend.write(b'\x1A')
         logger.info("end of page")
+        
+    def __is_print_finished(self, timeout):
+        data = self._backend.read(32,timeout)
+        while data is None:
+            data = self._backend.read(32, timeout)
+
+        return Status(data).status == StatusCodes.PRINTING_DONE
 
 
 class P700(GenericPrinter):
