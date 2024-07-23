@@ -10,7 +10,8 @@ from . import BiDirectionalBackend
 class BTSerialBackend(BiDirectionalBackend):
     def __init__(self, dev_path: str):
         if serial is None:
-            raise RuntimeError('Bluetooth is not supported. Pacakge serial is missing.')
+            raise RuntimeError(
+                'Bluetooth is not supported. Pacakge serial is missing.')
         dev = serial.Serial(
             dev_path,
             baudrate=9600,
@@ -27,6 +28,6 @@ class BTSerialBackend(BiDirectionalBackend):
     def write(self, data: bytes):
         self._dev.write(data)
 
-    def read(self, count: int) -> bytes:
+    def read(self, count: int, timeout=None) -> bytes:
         data = self._dev.read(count)
         return data

@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from logging import getLogger
 import struct
 from typing import TypeVar
-import time
 
 import packbits
 
@@ -50,7 +49,8 @@ class Status:
         _data['errors'] = Error(data[8], data[9])
         _data['media_width'] = int(data[10])
         try:
-            _data['media_type'] = {x.value: x for x in MediaType}[int(data[11])]
+            _data['media_type'] = {
+                x.value: x for x in MediaType}[int(data[11])]
         except IndexError:
             raise RuntimeError("Unsupported media type {data[11]}")
         # assert data[12] == 0x00  # Number of colors
@@ -67,16 +67,19 @@ class Status:
         # assert data[20] == 0x00  # Phase number (higher order bytes)
         # assert data[21] == 0x00  # Phase number (lower order bytes)
         try:
-            _data['notification'] = {x.value: x for x in NotificationCodes}[int(data[22])]
+            _data['notification'] = {
+                x.value: x for x in NotificationCodes}[int(data[22])]
         except IndexError:
             raise RuntimeError("Unknown notification {data[18]}")
         # assert data[23] == 0x00  # Expansion area
         try:
-            _data['tape_color'] = {x.value: x for x in TapeColor}[int(data[24])]
+            _data['tape_color'] = {
+                x.value: x for x in TapeColor}[int(data[24])]
         except IndexError:
             raise RuntimeError("Unknown tape color {data[18]}")
         try:
-            _data['text_color'] = {x.value: x for x in TextColor}[int(data[25])]
+            _data['text_color'] = {
+                x.value: x for x in TextColor}[int(data[25])]
         except IndexError:
             raise RuntimeError("Unknown text color {data[18]}")
         # data[26:29]  # Hardware settings
@@ -99,7 +102,7 @@ class Status:
         if self._media is None:
             self._media = Media.get_media(self.media_width, self.media_type)
         return self._media
-    
+
     @property
     def status(self) -> Media:
         if self._data['status'] is not None:
@@ -196,7 +199,8 @@ class GenericPrinter(BasePrinter):
         advanced_mode = 0
         if job.half_cut:
             if not self._FEATURE_HALF_CUT:
-                raise RuntimeError('Half cut is not supported by this printer.')
+                raise RuntimeError(
+                    'Half cut is not supported by this printer.')
             advanced_mode = advanced_mode | AdvancedModeSettings.HALF_CUT.value
         if not job.chain:
             advanced_mode = advanced_mode | AdvancedModeSettings.CHAIN_PRINTING.value
@@ -217,7 +221,8 @@ class GenericPrinter(BasePrinter):
 
             # Print information command
             # b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00'
-            information_command = b'\x1Biz\x86' + media_type + media_size + b'\x00\x00\x00\00\x00\x00'
+            information_command = b'\x1Biz\x86' + media_type + \
+                media_size + b'\x00\x00\x00\00\x00\x00'
             self._backend.write(information_command)
             if i == 0 and auto_cut:
                 # Ugly workaround
@@ -260,9 +265,9 @@ class GenericPrinter(BasePrinter):
         # end page
         self._backend.write(b'\x1A')
         logger.info("end of page")
-        
+
     def __is_print_finished(self, timeout):
-        data = self._backend.read(32,timeout)
+        data = self._backend.read(32, timeout)
         while data is None:
             data = self._backend.read(32, timeout)
 
@@ -274,6 +279,10 @@ class P700(GenericPrinter):
 
 
 class P750W(GenericPrinter):
+    pass
+
+
+class PT2730(GenericPrinter):
     pass
 
 
