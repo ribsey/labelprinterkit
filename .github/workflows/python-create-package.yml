@@ -37,5 +37,5 @@ jobs:
         with:
           name: labelprinterkit
           path: |
-            dist/labelptrinterkit-*.whl
-            dist/labelptrinterkit-*.tar.gz
+            dist/labelprinterkit-*.whl
+            dist/labelprinterkit-*.tar.gz
