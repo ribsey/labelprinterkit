@@ -8,6 +8,7 @@ import usb.util
 from . import BaseBackend
 from .. import BrotherPrinterError
 
+
 class PyUSBBackend(BaseBackend):
     """Assumes only a SINGLE USB Printer / Borther Device is Attached"""
 

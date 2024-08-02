@@ -6,6 +6,7 @@ from labelprinterkit.backends.bluetooth import BTSerialBackend
 from labelprinterkit.backends.network import NetworkBackend
 from labelprinterkit.backends.usb import PyUSBBackend
 
+
 class Backend(Enum):
     USB = auto()
     WIFI = auto()

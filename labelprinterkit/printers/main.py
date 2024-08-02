@@ -4,6 +4,7 @@ from typing import Type
 from labelprinterkit.constants import Resolution
 from labelprinterkit.printers import GenericPrinter
 
+
 class P700(GenericPrinter):
     pass
 
