@@ -7,7 +7,10 @@ import usb.util
 
 from . import BaseBackend, BrotherPrinterError
 
+
 class PyUSBBackend(BaseBackend):
+    """Assumes only a SINGLE USB Printer / Borther Device is Attached"""
+
     def __init__(self) -> None:
         self._dev = self.get_device()
 
@@ -30,6 +33,18 @@ class PyUSBBackend(BaseBackend):
         for cfg in dev:
             if usb.util.find_descriptor(cfg, bInterfaceClass=7) is not None:
                 return True
+        return False
+
+    @staticmethod
+    def is_brother_manufacturer(dev) -> bool:
+        """Check if the Device is a Brother Printer - by Manufacturer"""
+        try:
+            manufacturer = usb.util.get_string(dev, dev.iManufacturer)
+        except (usb.core.USBError, ValueError):
+            manufacturer = None
+
+        if manufacturer == "Brother":
+            return True
         return False
 
     def detach_from_kernel(self) -> None:
