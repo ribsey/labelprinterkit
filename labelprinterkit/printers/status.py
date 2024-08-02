@@ -1,5 +1,5 @@
-from labelprinterkit.constants import Media, MediaType, NotificationCodes, StatusCodes, TapeColor, TextColor
-from labelprinterkit.printers.error import Error
+from .error import Error
+from ..constants import Media, MediaType, NotificationCodes, StatusCodes, TapeColor, TextColor
 
 
 class Status:

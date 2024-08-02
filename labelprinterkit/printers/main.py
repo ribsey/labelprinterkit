@@ -1,9 +1,8 @@
 from enum import Enum, auto
 from typing import Type
 
-from labelprinterkit.constants import Resolution
-from labelprinterkit.printers import GenericPrinter
-
+from . import GenericPrinter
+from ..constants import Resolution
 
 class P700(GenericPrinter):
     pass

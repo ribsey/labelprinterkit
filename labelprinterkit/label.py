@@ -17,8 +17,8 @@ except ImportError:
     ERROR_CORRECT_Q = 3
     ERROR_CORRECT_H = 2
 
-from labelprinterkit.constants import Resolution
-from labelprinterkit.page import BasePage, image_to_bitmap, bitmap_to_image
+from .constants import Resolution
+from .page import BasePage, image_to_bitmap, bitmap_to_image
 
 logger = getLogger(__name__)
 

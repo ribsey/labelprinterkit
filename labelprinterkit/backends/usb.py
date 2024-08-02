@@ -5,8 +5,8 @@ from time import sleep
 import usb.core
 import usb.util
 
-from labelprinterkit import BrotherPrinterError
-from labelprinterkit.backends import BaseBackend
+from . import BaseBackend
+from .. import BrotherPrinterError
 
 class PyUSBBackend(BaseBackend):
     """Assumes only a SINGLE USB Printer / Borther Device is Attached"""

@@ -1,11 +1,10 @@
 from enum import Enum, auto
 from typing import Type
 
-from labelprinterkit.backends import BaseBackend
-from labelprinterkit.backends.bluetooth import BTSerialBackend
-from labelprinterkit.backends.network import NetworkBackend
-from labelprinterkit.backends.usb import PyUSBBackend
-
+from . import BaseBackend
+from .bluetooth import BTSerialBackend
+from .network import NetworkBackend
+from .usb import PyUSBBackend
 
 class Backend(Enum):
     USB = auto()

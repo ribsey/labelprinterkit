@@ -1,4 +1,4 @@
-from labelprinterkit.constants import ErrorCodes
+from ..constants import ErrorCodes
 
 
 class Error:

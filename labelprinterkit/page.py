@@ -6,7 +6,7 @@ from typing import Tuple, TypeVar
 
 from PIL import Image, ImageChops
 
-from labelprinterkit.constants import Resolution
+from .constants import Resolution
 
 def image_to_bitmap(image: Image) -> Tuple[bytes, int, int]:
     assert image.mode == "1"

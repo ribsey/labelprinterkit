@@ -5,10 +5,10 @@ from typing import TypeVar
 
 import packbits
 
-from labelprinterkit.backends import BaseBackend
-from labelprinterkit.constants import AdvancedModeSettings, Media, Resolution, VariousModesSettings
-from labelprinterkit.job import Job
-from labelprinterkit.printers.status import Status
+from .status import Status
+from ..backends import BaseBackend
+from ..constants import AdvancedModeSettings, Media, Resolution, VariousModesSettings
+from ..job import Job
 
 logger = getLogger(__name__)
 

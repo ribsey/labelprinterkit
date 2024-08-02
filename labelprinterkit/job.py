@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from labelprinterkit.constants import Media, Resolution
-from labelprinterkit.page import PageType
+from .constants import Media, Resolution
+from .page import PageType
 
 class Job:
     def __init__(
