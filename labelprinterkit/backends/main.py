@@ -6,7 +6,7 @@ from labelprinterkit.backends.bluetooth import BTSerialBackend
 from labelprinterkit.backends.network import NetworkBackend
 from labelprinterkit.backends.usb import PyUSBBackend
 
-class ConnectionType(Enum):
+class Backend(Enum):
     USB = auto()
     WIFI = auto()
     BLUETOOTH = auto()
@@ -14,16 +14,16 @@ class ConnectionType(Enum):
     @property
     def backend(self) -> Type[BaseBackend]:
         match self:
-            case ConnectionType.USB:
+            case Backend.USB:
                 return PyUSBBackend
-            case ConnectionType.BLUETOOTH:
+            case Backend.BLUETOOTH:
                 return BTSerialBackend
-            case ConnectionType.WIFI:
+            case Backend.WIFI:
                 return NetworkBackend
 
     @staticmethod
-    def get(name: str) -> "ConnectionType":
-        for connection_type in ConnectionType:
+    def get(name: str) -> "Backend":
+        for connection_type in Backend:
             if connection_type.name.lower() == name.lower():
                 return connection_type
         raise ValueError(f"Backend with name {name} not found")

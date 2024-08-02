@@ -5,8 +5,8 @@ from time import sleep
 import usb.core
 import usb.util
 
-from . import BaseBackend, BrotherPrinterError
-
+from . import BaseBackend
+from .. import BrotherPrinterError
 
 class PyUSBBackend(BaseBackend):
     """Assumes only a SINGLE USB Printer / Borther Device is Attached"""
@@ -18,9 +18,9 @@ class PyUSBBackend(BaseBackend):
         self._dev = self.get_device()
 
     @staticmethod
-    def get_device(self) -> usb.core.Device:
+    def get_device() -> usb.core.Device:
         """Get the PyUSB Device for a USB Printer"""
-        dev = usb.core.find(custom_match=self.is_usb_printer)
+        dev = usb.core.find(custom_match=PyUSBBackend.is_usb_printer)
         if dev is None:
             raise BrotherPrinterError("No Printer Found")
         return dev
