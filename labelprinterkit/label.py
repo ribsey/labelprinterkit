@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from logging import getLogger
 from math import ceil
-from typing import TypeVar, NamedTuple, Optional
+from typing import NamedTuple, Optional, TypeVar
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
+
 try:
     from qrcode import QRCode as _QRCode
     from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_H, ERROR_CORRECT_Q
@@ -15,8 +17,8 @@ except ImportError:
     ERROR_CORRECT_Q = 3
     ERROR_CORRECT_H = 2
 
-from .constants import Resolution
-from .page import BasePage, image_to_bitmap, bitmap_to_image
+from labelprinterkit.constants import Resolution
+from labelprinterkit.page import BasePage, image_to_bitmap, bitmap_to_image
 
 logger = getLogger(__name__)
 
@@ -41,16 +43,14 @@ class Padding(NamedTuple):
 
 class Item(ABC):
     @abstractmethod
-    def render(self) -> Image:
-        ...
+    def render(self) -> Image: ...
 
 
-ItemType = TypeVar('ItemType', bound=Item)
+ItemType = TypeVar("ItemType", bound=Item)
 
 
 class Text(Item):
-    def __init__(self, height: int, text: str, font_path: str, font_index: int = 0, font_size: int | None = None,
-                 padding: Padding = Padding(0, 0, 0, 0)):
+    def __init__(self, height: int, text: str, font_path: str, font_index: int = 0, font_size: int | None = None, padding: Padding = Padding(0, 0, 0, 0)):
         self.text = text
         self.height = height
         self.font_path = font_path
@@ -92,7 +92,7 @@ class Text(Item):
             lower = upper
             upper *= 2
         while True:
-            test = ceil((upper+lower)/2)
+            test = ceil((upper + lower) / 2)
             font = ImageFont.truetype(self.font_path, test)
             image = Image.new("1", font.getsize(self.text), "white")
             draw = ImageDraw.Draw(image)
@@ -109,11 +109,9 @@ class Text(Item):
 
 
 class QRCode(Item):
-    def __init__(self, width: int, data: str,
-                 error_correction: Optional[ERROR_CORRECT_M | ERROR_CORRECT_H | ERROR_CORRECT_Q] = None,
-                 box_size: int | None = None, border: int = 0):
+    def __init__(self, width: int, data: str, error_correction: Optional[ERROR_CORRECT_M | ERROR_CORRECT_H | ERROR_CORRECT_Q] = None, box_size: int | None = None, border: int = 0):
         if _QRCode is None:
-            raise RuntimeError('No QR code support. Package qrcode is not installed.')
+            raise RuntimeError("No QR code support. Package qrcode is not installed.")
         self._width = width
         self._data = data
         self._error_correction = error_correction
@@ -204,18 +202,18 @@ class Flag(BasePage):
     def __init__(self, item1: ItemType, item2: ItemType, spacing=265):
         rendered_images = [item1.render(), item2.render()]
         image_max_length = max([rendered_image.size[0] for rendered_image in rendered_images])
-        length = 2*image_max_length + spacing
+        length = 2 * image_max_length + spacing
         height = max([rendered_image.size[1] for rendered_image in rendered_images])
 
         line_length = 2 + spacing % 2
         data = 0x0
-        for i in range(height-1):
+        for i in range(height - 1):
             data <<= 1
             if not i % 8:
                 data |= 0x01
-        b_len = round(height/8)
-        data <<= b_len*8 - height
-        bitmap = line_length * data.to_bytes(b_len, byteorder='big')
+        b_len = round(height / 8)
+        data <<= b_len * 8 - height
+        bitmap = line_length * data.to_bytes(b_len, byteorder="big")
         line_image = bitmap_to_image(bitmap, height, line_length)
 
         white_spacing = (spacing - line_length) // 2

@@ -1,19 +1,20 @@
 from __future__ import annotations
-from .page import PageType
-from .constants import Media, Resolution
 
+from labelprinterkit.constants import Media, Resolution
+from labelprinterkit.page import PageType
 
 class Job:
-    def __init__(self,
-                 media: Media,
-                 auto_cut: bool = True,
-                 mirror_printing: bool = False,
-                 half_cut: bool = False,
-                 chain: bool = False,
-                 special_tape: bool = False,
-                 cut_each: int = 1,
-                 resolution: Resolution = Resolution.LOW
-                 ):
+    def __init__(
+        self,
+        media: Media,
+        auto_cut: bool = True,
+        mirror_printing: bool = False,
+        half_cut: bool = False,
+        chain: bool = False,
+        special_tape: bool = False,
+        cut_each: int = 1,
+        resolution: Resolution = Resolution.LOW,
+    ):
 
         self.media = media
 
@@ -38,13 +39,13 @@ class Job:
     def add_page(self, page: PageType):
         width = self.media.value.printarea
         if page.width != width:
-            raise RuntimeError('Page width does not match media width')
+            raise RuntimeError("Page width does not match media width")
         if page.resolution != self.resolution:
-            raise RuntimeError('Page resolution does not match media resolution')
+            raise RuntimeError("Page resolution does not match media resolution")
         if self.resolution == Resolution.LOW:
             min_length = 31
         else:
             min_length = 62
         if page.length < min_length:
-            raise RuntimeError('Page is not long enough')
+            raise RuntimeError("Page is not long enough")
         self._pages.append(page)
