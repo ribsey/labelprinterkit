@@ -1,3 +1,4 @@
+import logging
 import struct
 from abc import ABC, abstractmethod
 from logging import getLogger
@@ -6,7 +7,7 @@ from typing import TypeVar
 import packbits
 
 from .status import Status
-from ..backends import BaseBackend
+from ..backends import BaseBackend, UniDirectionalBackend
 from ..constants import AdvancedModeSettings, Media, Resolution, VariousModesSettings
 from ..job import Job
 
