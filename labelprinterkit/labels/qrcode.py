@@ -4,7 +4,7 @@ from typing import Optional
 
 from PIL import Image
 
-from labelprinterkit.labels import Item
+from . import Item
 
 try:
     from qrcode import QRCode as _QRCode

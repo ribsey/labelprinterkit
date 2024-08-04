@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from PIL import Image
 
-from labelprinterkit.labels.label import Item, ItemType
+from . import Item, ItemType
 
 class Box(Item):
     def __init__(self, height: int, *items: ItemType, vertical: bool = False, left_padding: int = 0) -> None:

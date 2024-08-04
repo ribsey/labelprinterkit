@@ -6,8 +6,8 @@ from typing import NamedTuple
 
 from PIL import Image, ImageDraw, ImageFont
 
-from labelprinterkit.labels import Item
-from labelprinterkit.utils.image import crop
+from . import Item
+from ..utils.image import crop
 
 logger = getLogger(__name__)
 

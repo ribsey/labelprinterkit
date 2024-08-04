@@ -1,9 +1,9 @@
 from logging import getLogger
 
-from labelprinterkit.constants import Resolution
-from labelprinterkit.labels import ItemType
-from labelprinterkit.page import BasePage
-from labelprinterkit.utils.image import image_to_bitmap
+from . import ItemType
+from ..constants import Resolution
+from ..page import BasePage
+from ..utils.image import image_to_bitmap
 
 logger = getLogger(__name__)
 
