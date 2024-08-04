@@ -3,6 +3,7 @@ from __future__ import annotations
 from .constants import Media, Resolution
 from .page import PageType
 
+
 class Job:
     def __init__(
         self,

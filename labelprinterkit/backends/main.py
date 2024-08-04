@@ -6,6 +6,7 @@ from .bluetooth import BTSerialBackend
 from .network import NetworkBackend
 from .usb import PyUSBBackend
 
+
 class Backend(Enum):
     USB = auto()
     WIFI = auto()

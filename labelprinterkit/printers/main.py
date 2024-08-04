@@ -4,6 +4,7 @@ from typing import Type
 from . import GenericPrinter
 from ..constants import Resolution
 
+
 class P700(GenericPrinter):
     pass
 
