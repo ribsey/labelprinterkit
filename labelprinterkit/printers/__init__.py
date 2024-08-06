@@ -77,7 +77,7 @@ class GenericPrinter(BasePrinter):
 
         return Status(data)
 
-    def print(self, job: Job):
+    def print(self, job: Job, timeout: int = 1000):
         logger.info("starting print")
 
         self.reset()
@@ -155,7 +155,7 @@ class GenericPrinter(BasePrinter):
             # send rastered lines
             for line in page:
                 logging.debug(f"line: {line}")
-                self._backend.write(b"G" + encode_line(line, offset))
+                self._backend.write(b"G" + encode_line(line, offset), timeout=timeout)
 
             self._backend.write(b"Z")
 

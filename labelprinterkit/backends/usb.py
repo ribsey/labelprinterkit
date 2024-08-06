@@ -8,7 +8,6 @@ import usb.util
 from . import BaseBackend
 from .. import BrotherPrinterError
 
-
 class PyUSBBackend(BaseBackend):
     """Assumes only a SINGLE USB Printer / Borther Device is Attached"""
 
@@ -66,12 +65,13 @@ class PyUSBBackend(BaseBackend):
 
         self.refresh()
 
-    def write(self, data: bytes) -> None:
-        self._dev.write(0x2, data)
+    def write(self, data: bytes, timeout: int = 1000) -> None:
+        """Timeout - Default PyUSB Read Timeout is 1000ms=1s"""
+        self._dev.write(endpoint=0x2, data=data, timeout=timeout)
 
     def read(self, count: int) -> bytes | None:
         for i in range(0, 3):
-            data = self._dev.read(0x81, count)
+            data = self._dev.read(endpoint=0x81, size_or_buffer=count)
             if data:
                 return data
             sleep(0.1)
