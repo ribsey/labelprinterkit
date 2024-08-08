@@ -276,7 +276,7 @@ class P750W(GenericPrinter):
     pass
 
 
-class PT2730(GenericPrinter):
+class P2730(GenericPrinter):
     pass
 
 
