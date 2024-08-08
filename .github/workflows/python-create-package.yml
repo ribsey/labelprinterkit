@@ -45,15 +45,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install build
 
-      # - name: Update version
-      #   run: |
-      #     python -c "
-      #     import toml
-      #     data = toml.load('pyproject.toml')
-      #     data['tool']['poetry']['version'] = '${{ steps.gitversion.outputs.majorMinorPatch }}'
-      #     with open('pyproject.toml', 'w') as f:
-      #         toml.dump(data, f)
-      #     "
+      - name: Update version
+        run: |
+          python -c "
+          import toml
+          data = toml.load('pyproject.toml')
+          data['tool']['poetry']['version'] = '${{ steps.gitversion.outputs.majorMinorPatch }}'
+          with open('pyproject.toml', 'w') as f:
+              toml.dump(data, f)
+          "
 
       - name: Build package
         run: python -m build
