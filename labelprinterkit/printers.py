@@ -49,8 +49,7 @@ class Status:
         _data['errors'] = Error(data[8], data[9])
         _data['media_width'] = int(data[10])
         try:
-            _data['media_type'] = {
-                x.value: x for x in MediaType}[int(data[11])]
+            _data['media_type'] = {x.value: x for x in MediaType}[int(data[11])]
         except IndexError:
             raise RuntimeError("Unsupported media type {data[11]}")
         # assert data[12] == 0x00  # Number of colors
@@ -67,14 +66,12 @@ class Status:
         # assert data[20] == 0x00  # Phase number (higher order bytes)
         # assert data[21] == 0x00  # Phase number (lower order bytes)
         try:
-            _data['notification'] = {
-                x.value: x for x in NotificationCodes}[int(data[22])]
+            _data['notification'] = {x.value: x for x in NotificationCodes}[int(data[22])]
         except IndexError:
             raise RuntimeError("Unknown notification {data[18]}")
         # assert data[23] == 0x00  # Expansion area
         try:
-            _data['tape_color'] = {
-                x.value: x for x in TapeColor}[int(data[24])]
+            _data['tape_color'] = {x.value: x for x in TapeColor}[int(data[24])]
         except IndexError:
             raise RuntimeError("Unknown tape color {data[18]}")
         try:
@@ -199,8 +196,7 @@ class GenericPrinter(BasePrinter):
         advanced_mode = 0
         if job.half_cut:
             if not self._FEATURE_HALF_CUT:
-                raise RuntimeError(
-                    'Half cut is not supported by this printer.')
+                raise RuntimeError('Half cut is not supported by this printer.')
             advanced_mode = advanced_mode | AdvancedModeSettings.HALF_CUT.value
         if not job.chain:
             advanced_mode = advanced_mode | AdvancedModeSettings.CHAIN_PRINTING.value
@@ -221,8 +217,7 @@ class GenericPrinter(BasePrinter):
 
             # Print information command
             # b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00'
-            information_command = b'\x1Biz\x86' + media_type + \
-                media_size + b'\x00\x00\x00\00\x00\x00'
+            information_command = b'\x1Biz\x86' + media_type + media_size + b'\x00\x00\x00\00\x00\x00'
             self._backend.write(information_command)
             if i == 0 and auto_cut:
                 # Ugly workaround
