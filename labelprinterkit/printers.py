@@ -75,8 +75,7 @@ class Status:
         except IndexError:
             raise RuntimeError("Unknown tape color {data[18]}")
         try:
-            _data['text_color'] = {
-                x.value: x for x in TextColor}[int(data[25])]
+            _data['text_color'] = {x.value: x for x in TextColor}[int(data[25])]
         except IndexError:
             raise RuntimeError("Unknown text color {data[18]}")
         # data[26:29]  # Hardware settings
