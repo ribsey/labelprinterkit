@@ -18,6 +18,10 @@ class Padding(NamedTuple):
     bottom: int
     right: int
 
+    @staticmethod
+    def from_dict(data: dict) -> Padding:
+        return Padding(data.get("left", 0), data.get("top", 0), data.get("bottom", 0), data.get("right", 0))
+
 
 class Text(Item):
     def __init__(self, height: int, text: str, font_path: str, font_index: int = 0, font_size: int | None = None, padding: Padding = Padding(0, 0, 0, 0)) -> None:

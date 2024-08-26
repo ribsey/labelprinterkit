@@ -4,7 +4,6 @@ from typing import Type
 from . import GenericPrinter
 from ..constants import Resolution
 
-
 class P700(GenericPrinter):
     pass
 
@@ -33,6 +32,7 @@ class Printer(Enum):
     PTP_E500 = auto()
     PTP_E550W = auto()
 
+    @property
     def printer(self) -> Type[GenericPrinter]:
         match self:
             case Printer.PTP_700:
@@ -45,3 +45,10 @@ class Printer(Enum):
                 return E500
             case Printer.PTP_E550W:
                 return E550W
+
+    @staticmethod
+    def get(name: str) -> "Printer":
+        for printer_type in Printer:
+            if printer_type.name.lower() == name.lower():
+                return printer_type
+        raise ValueError(f"Printer with name {name} not found")
