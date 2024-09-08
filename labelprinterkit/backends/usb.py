@@ -5,22 +5,34 @@ from time import sleep
 import usb.core
 import usb.util
 
-from . import BaseBackend
 from .. import BrotherPrinterError
+from . import BaseBackend
+
 
 class PyUSBBackend(BaseBackend):
-    """Assumes only a SINGLE USB Printer / Borther Device is Attached"""
+    """Assumes only a SINGLE USB Printer / Brother Device is Attached"""
 
-    def __init__(self) -> None:
-        self._dev = self.get_device()
+    def __init__(self, vendor_id: int | None, product_id: int | None = None) -> None:
+        self.vendor_id = vendor_id
+        self.product_id = product_id
+
+        self._dev = self.get_device(vendor_id, product_id)
 
     def refresh(self) -> None:
-        self._dev = self.get_device()
+        self._dev = self.get_device(self.vendor_id, self.product_id)
 
     @staticmethod
-    def get_device() -> usb.core.Device:
+    def get_device(
+        vendor_id: int | None = None, product_id: int | None = None
+    ) -> usb.core.Device:
         """Get the PyUSB Device for a USB Printer"""
-        dev = usb.core.find(custom_match=PyUSBBackend.is_usb_printer)
+        if vendor_id and product_id:
+            def match_func(dev) -> bool:
+                return PyUSBBackend.has_vendor_product_id(dev, vendor_id, product_id)
+        else:
+            match_func = PyUSBBackend.is_usb_printer
+
+        dev = usb.core.find(custom_match=match_func)
         if dev is None:
             raise BrotherPrinterError("No Printer Found")
         return dev
@@ -46,6 +58,11 @@ class PyUSBBackend(BaseBackend):
         if manufacturer == "Brother":
             return True
         return False
+
+    @staticmethod
+    def has_vendor_product_id(dev, vendor_id: int, product_id: int) -> bool:
+        """Check if the Device has the given Vendor and Product ID"""
+        return dev.idVendor == vendor_id and dev.idProduct == product_id
 
     def detach_from_kernel(self) -> None:
         """
@@ -83,7 +100,11 @@ def handle_error(e: Exception) -> None:
     if isinstance(e, usb.core.USBError):
         match e.errno:
             case 16:
-                raise BrotherPrinterError("USB Device is Busy - Detach from Kernel") from e
+                raise BrotherPrinterError(
+                    "USB Device is Busy - Detach from Kernel"
+                ) from e
             case 19:
-                raise BrotherPrinterError("USB Device is Disconnected - Turn the Device On") from e
+                raise BrotherPrinterError(
+                    "USB Device is Disconnected - Turn the Device On"
+                ) from e
     raise e
