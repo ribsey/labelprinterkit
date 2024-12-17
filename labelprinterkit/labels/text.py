@@ -39,13 +39,15 @@ class Text(Item):
         iheight = self.height - self.padding.top - self.padding.bottom
         if self.font_size is None:
             font_size = self._calc_font_size(iheight)
-            logger.debug(f"text: {self.text}, calculated font size: {font_size}")
+            logger.debug(
+                f"text: {self.text}, calculated font size: {font_size}")
         else:
             font_size = self.font_size
         font = ImageFont.truetype(self.font_path, font_size, self.font_index)
-        text_x, _ = font.getsize(self.text)
-        image = Image.new("1", (self.padding.left + text_x + self.padding.right, self.height), "white")
-        fimage = Image.new("1", font.getsize(self.text), "white")
+        text_x, _ = self.__getTextSize(font, self.text)
+        image = Image.new("1", (self.padding.left + text_x +
+                          self.padding.right, self.height), "white")
+        fimage = Image.new("1", self.__getTextSize(font, self.text), "white")
         draw = ImageDraw.Draw(fimage)
         draw.text((0, 0), self.text, "black", font)
         fimage = crop(fimage)
@@ -57,7 +59,8 @@ class Text(Item):
         upper = 1
         while True:
             font = ImageFont.truetype(self.font_path, upper)
-            image = Image.new("1", font.getsize(self.text), "white")
+            image = Image.new("1", self.__getTextSize(
+                font, self.text), "white")
             draw = ImageDraw.Draw(image)
             draw.text((0, 0), self.text, "black", font)
             font_height = crop(image).size[1]
@@ -68,7 +71,8 @@ class Text(Item):
         while True:
             test = ceil((upper + lower) / 2)
             font = ImageFont.truetype(self.font_path, test)
-            image = Image.new("1", font.getsize(self.text), "white")
+            image = Image.new("1", self.__getTextSize(
+                font, self.text), "white")
             draw = ImageDraw.Draw(image)
             draw.text((0, 0), self.text, "black", font)
             font_height = crop(image).size[1]
@@ -80,3 +84,8 @@ class Text(Item):
                 lower = test
             else:
                 return test
+
+    @staticmethod
+    def __getTextSize(font: ImageFont.FreeTypeFont, text):
+        left, top, right, bottom = font.getbbox(text)
+        return (right - left, bottom - top)
