@@ -8,7 +8,7 @@ import packbits
 
 from .status import Status
 from ..backends import BaseBackend, UniDirectionalBackend
-from ..constants import AdvancedModeSettings, Media, Resolution, VariousModesSettings
+from ..constants import AdvancedModeSettings, Media, Resolution, StatusCodes, VariousModesSettings
 from ..job import Job
 
 logger = getLogger(__name__)
@@ -105,7 +105,8 @@ class GenericPrinter(BasePrinter):
         advanced_mode = 0
         if job.half_cut:
             if not self._FEATURE_HALF_CUT:
-                raise RuntimeError("Half cut is not supported by this printer.")
+                raise RuntimeError(
+                    "Half cut is not supported by this printer.")
             advanced_mode = advanced_mode | AdvancedModeSettings.HALF_CUT.value
         if not job.chain:
             advanced_mode = advanced_mode | AdvancedModeSettings.CHAIN_PRINTING.value
@@ -126,7 +127,8 @@ class GenericPrinter(BasePrinter):
 
             # Print information command
             # b'\x1Biz\x86\x01\x0c\x00\x00\x00\00\x00\x00'
-            information_command = b"\x1Biz\x86" + media_type + media_size + b"\x00\x00\x00\00\x00\x00"
+            information_command = b"\x1Biz\x86" + media_type + \
+                media_size + b"\x00\x00\x00\00\x00\x00"
             self._backend.write(information_command)
             if i == 0 and auto_cut:
                 # Ugly workaround
@@ -155,7 +157,8 @@ class GenericPrinter(BasePrinter):
             # send rastered lines
             for line in page:
                 logging.debug(f"line: {line}")
-                self._backend.write(b"G" + encode_line(line, offset), timeout=timeout)
+                self._backend.write(
+                    b"G" + encode_line(line, offset), timeout=timeout)
 
             self._backend.write(b"Z")
 
@@ -163,6 +166,16 @@ class GenericPrinter(BasePrinter):
             if i < len(job) - 1:
                 self._backend.write(b"\x0C")
 
+                while not self.__is_print_finished(page.length*1000):
+                    pass
+
         # end page
         self._backend.write(b"\x1A")
         logger.info("end of page")
+
+    def __is_print_finished(self, timeout):
+        data = self._backend.read(32, timeout)
+        while data is None:
+            data = self._backend.read(32, timeout)
+
+        return Status(data).status == StatusCodes.PRINTING_DONE
