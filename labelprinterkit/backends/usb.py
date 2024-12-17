@@ -4,6 +4,7 @@ from time import sleep
 
 import usb.core
 import usb.util
+import libusb_package
 
 from . import BaseBackend
 
@@ -17,7 +18,7 @@ class PyUSBBackend(BaseBackend):
     @staticmethod
     def get_device() -> usb.core.Device:
         """Get the PyUSB Device for a USB Printer"""
-        dev = usb.core.find(custom_match=PyUSBBackend.is_usb_printer)
+        dev = libusb_package.find(custom_match=PyUSBBackend.is_usb_printer)
         if dev is None:
             raise OSError("No Printer Found")
         return dev
@@ -68,9 +69,9 @@ class PyUSBBackend(BaseBackend):
     def write(self, data: bytes) -> None:
         self._dev.write(0x2, data)
 
-    def read(self, count: int) -> bytes | None:
+    def read(self, count: int, timeout=None) -> bytes | None:
         for _ in range(0, 3):
-            data = self._dev.read(0x81, count)
+            data = self._dev.read(0x81, count, timeout)
             if data:
                 return data
             sleep(0.1)

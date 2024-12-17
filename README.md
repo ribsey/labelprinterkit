@@ -57,6 +57,7 @@ The following printers are currently supported:
 
  * Brother P-Touch PT-700 (aka P700)
  * Brother P-Touch PT-750W (aka P750W)
+ * Brother P-Touch PT-2730 (aka P2730)
  * Brother H500
  * Brother E500
 
