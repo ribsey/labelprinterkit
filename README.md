@@ -9,7 +9,9 @@ Labelprinterkit's simple layout engine can be used to create simple labels:
 ```python
 from labelprinterkit.backends.usb import PyUSBBackend
 from labelprinterkit.printers import P700
-from labelprinterkit.label import Label, Text, Box, Padding
+from labelprinterkit.label import Label, Padding
+from labelprinterkit.labels.box import Box
+from labelprinterkit.labels.text import Text
 from labelprinterkit.job import Job
 from labelprinterkit.constants import Media
 from labelprinterkit.page import Page
@@ -46,6 +48,7 @@ printer.print(job)
 ```
 
 To use a Bluetooth connection:
+
 1. pair your device
 2. specify the serial device node when instantiating the printer:
 
@@ -68,9 +71,9 @@ officially supported (their protocol is similar, although not identical):
 
 The following backends are currently supported:
 
- * USB Printer Device Class via PyUSB
- * Bluetooth Serial connection via PySerial
- * Network connection via TCP
+* USB Printer Device Class via PyUSB
+* Bluetooth Serial connection via PySerial
+* Network connection via TCP
 
 The official source of this repository is at https://git.scc.kit.edu/scc-net/labelprinterkit.
 Pull requests and issues are also accepted on github at https://github.com/ogelpre/labelprinterkit.

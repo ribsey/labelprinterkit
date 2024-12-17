@@ -1,7 +1,7 @@
 from __future__ import annotations
+
 from enum import Enum
 from typing import NamedTuple
-
 
 class Resolution(Enum):
     LOW = (180, 180)
@@ -61,11 +61,17 @@ class Media(Enum):
 
     @classmethod
     def get_media(cls, width: int, media_type: MediaType):
-        medias = [media_size for media_size in cls
-                  if media_size.value.width == width and media_size.value.media_type == media_type]
+        medias = [media_size for media_size in cls if media_size.value.width == width and media_size.value.media_type == media_type]
         if not medias:
             return cls.UNSUPPORTED_MEDIA
         return medias[0]
+
+    @staticmethod
+    def get(name: str) -> "Media":
+        for media_type in Media:
+            if media_type.name.lower() == name.lower():
+                return media_type
+        raise ValueError(f"Media not found : {name}")
 
 
 class StatusCodes(Enum):
@@ -125,7 +131,7 @@ class TextColor(Enum):
     RED = 0x04
     BLUE = 0x05
     BLACK = 0x08
-    GOLD = 0x0a
+    GOLD = 0x0A
     BLUE_F = 0x62
     CLEANING = 0xF0
     STENCIL = 0xF1
