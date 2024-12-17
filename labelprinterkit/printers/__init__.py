@@ -166,7 +166,7 @@ class GenericPrinter(BasePrinter):
             if i < len(job) - 1:
                 self._backend.write(b"\x0C")
 
-                while not self.__is_print_finished(page.length*1000):
+                while not self.__is_print_finished(page.length*100):
                     pass
 
         # end page
